@@ -382,8 +382,8 @@ class FlowManagerService {
       const updateId = firstDoc.id;
       if (flowStep === 2) {
         const pathConfig = {
-          "graduation-event": 2,
-          "end-of-year-social&&graduation-event": 2,
+          "graduation-event": 3,
+          "end-of-year-social&&graduation-event": 3,
           "end-of-year-social": 6,
           "!end-of-year-social&&!graduation-event": 10,
         };
@@ -397,7 +397,18 @@ class FlowManagerService {
           .get();
         return updatedDoc.data();
       } else if (flowStep === 3) {
-        console.log(buttonPayload);
+        console.log("btn payload", buttonPayload);
+        if (buttonPayload.split("-")[0] === "no") {
+          await this.db
+            .collection("flows")
+            .doc(updateId)
+            .update({ "flowStep": 5 });
+          const updatedDoc = await this.db
+            .collection("flows")
+            .doc(updateId)
+            .get();
+          return updatedDoc.data();
+        }
       }
       return data;
     }
