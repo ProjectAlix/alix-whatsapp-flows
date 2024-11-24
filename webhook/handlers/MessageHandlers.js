@@ -186,10 +186,14 @@ class InboundMessageHandler extends BaseMessageHandler {
    * @returns {Promise<void>}
    */
   async startFlow({ userInfo, messageToSave, flowName, extraData }) {
-    await this.databaseService.checkFlowPermission(
-      flowName,
-      messageToSave.OrganizationId
-    );
+    if (
+      !(await this.databaseService.checkFlowPermission(
+        flowName,
+        messageToSave.OrganizationId
+      ))
+    ) {
+      return this.res.status(403).json({ error: "Permission Denied" });
+    }
     const trackedFlowId = uuidv4(); //create an ID to track the flow by
     const updatedMessageToSave = {
       ...messageToSave,
