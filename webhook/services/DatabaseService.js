@@ -310,6 +310,14 @@ class DatabaseService {
    * @param {string} statusUpdate - The new status for the flow (e.g., "completed", "delivered").
    * @returns {Promise<void>}
    */
+  async checkFlowPermission(flowName, organizationId) {
+    console.log("checking permissions", organizationId);
+    const flow = await this.availableFlowsCollection.findOne({
+      flowName,
+      organizationIds: { $in: [organizationId] },
+    });
+    return !!flow; // Returns true if a flow is found, false otherwise
+  }
   async updateFlowStatus(flowId, statusUpdate) {
     const query = { "trackedFlowId": flowId };
     const update = {

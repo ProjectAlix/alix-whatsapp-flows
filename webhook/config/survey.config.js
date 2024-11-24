@@ -188,7 +188,15 @@ const fatMacysSurveyConfig2 = {
     },
   },
 };
+
+const fmSocialSurveyDict = {
+  "graduation-event": "Graduation event",
+  "end-of-year-social": "End of year social",
+  "end-of-year-social&&graduation-event": "Both",
+  "!end-of-year-social&&!graduation-event": "None",
+};
 module.exports = {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
+  fmSocialSurveyDict,
 };

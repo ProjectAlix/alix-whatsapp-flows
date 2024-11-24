@@ -1,7 +1,13 @@
 const { createTranscriptionTask } = require("../helpers/cloud_tasks.helpers");
+const {
+  formatFirstSocialSurveyResponse,
+} = require("../helpers/formatting.helpers");
 const { v4: uuidv4 } = require("uuid");
 const { BaseMessageHandler } = require("./BaseMessageHandler");
-const { fatMacysSurveyConfig1 } = require("../config/survey.config");
+const {
+  fatMacysSurveyConfig1,
+  fatMacysSurveyConfig2,
+} = require("../config/survey.config");
 
 /**
  * Service for handling inbound messages from the Twilio API and triggering flows.
@@ -177,57 +183,13 @@ class InboundMessageHandler extends BaseMessageHandler {
    * @param {Object} params.extraData.userSelection - Data about the user's selection in the flow.
    * @param {number} params.extraData.userSelection.page - Page number in the flow.
    * @param {boolean} params.extraData.userSelection.endFlow - Whether the flow should end.
-   *
-   *@example
-   * const userInfo = {
-   *   _id: new ObjectId(),
-   *   WaId: '-------',
-   *   username: 'Daria',
-   *   ProfileName: 'Daria',
-   *   organizationId: new ObjectId(),
-   *   CreatedAt: new Date('2024-10-09T11:38:51.412Z'),
-   *   LastSeenAt: new Date('2024-10-29T16:54:00.594Z'),
-   *   isContactable: true,
-   *   isAnon: false,
-   *   reminderSent: true
-   * };
-   *@example
-   * const messageToSave = {
-   *   OrganizationId: new ObjectId(),
-   *   SmsMessageSid: '---',
-   *   NumMedia: '0',
-   *   ProfileName: 'Daria Naumova',
-   *   MessageType: 'text',
-   *   SmsSid: '---',
-   *   WaId: '-------',
-   *   SmsStatus: 'received',
-   *   Body: 'hi',
-   *   To: 'whatsapp:+44-----',
-   *   MessagingServiceSid: '---',
-   *   NumSegments: '1',
-   *   ReferralNumMedia: '0',
-   *   MessageSid: '---',
-   *   AccountSid: '---',
-   *   From: 'whatsapp:+-------',
-   *   ApiVersion: '2010-04-01',
-   *   CreatedAt: new Date('2024-10-30T17:00:54.739Z'),
-   *   Direction: 'inbound',
-   *   Status: 'received'
-   * };
-   *
-   * const flowName = 'signposting';
-   * const extraData = { userSelection: { page: 1, endFlow: false } };
-   * High-level overview of Intermediate Steps:
-   * - `createMessageData`: Builds message data for flow initiation.
-   * - `createNewFlow`: Creates a new flow in Firestore.
-   * - `databaseService.saveFlow`: Saves the flow data in the database.
-   * - `postRequestService.make_request`: Sends the flow request to an external service.
-   * - `databaseService.saveMessage`: Persists the message data in the database.
-   * - `createTranscriptionTask`: Starts a transcription task if the message is audio.
-   *
    * @returns {Promise<void>}
    */
   async startFlow({ userInfo, messageToSave, flowName, extraData }) {
+    await this.databaseService.checkFlowPermission(
+      flowName,
+      messageToSave.OrganizationId
+    );
     const trackedFlowId = uuidv4(); //create an ID to track the flow by
     const updatedMessageToSave = {
       ...messageToSave,
@@ -475,9 +437,10 @@ class InboundMessageHandler extends BaseMessageHandler {
       messageData.flowSection = updatedDoc.flowSection;
       messageData.flowStep = updatedDoc.flowStep;
     } else if (flowName === "fm-social-survey") {
+      const response = formatFirstSocialSurveyResponse(this.body.Body);
       await this.databaseService.updateFlowWithResponse(
         flowId,
-        this.body.Body,
+        response,
         this.body.MessageSid
       );
       messageData.cancelSurvey = await this.updateSurveyCancellation(flowId);
@@ -488,6 +451,16 @@ class InboundMessageHandler extends BaseMessageHandler {
         flowStep,
       });
       messageData.flowStep = updatedDoc.flowStep;
+      const { questionContent, questionNumber } =
+        fatMacysSurveyConfig2?.[updatedDoc.flowSection]?.[
+          updatedDoc.flowStep
+        ] || {};
+      if (questionContent && questionNumber) {
+        await this.databaseService.updateFlowSurvey(flowId, {
+          questionContent,
+          questionNumber,
+        });
+      }
     }
     await this.processFlowResponse({
       flowName,

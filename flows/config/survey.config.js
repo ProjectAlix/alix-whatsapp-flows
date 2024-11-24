@@ -318,7 +318,7 @@ const fatMacysSurveyConfig2 = {
       responseContent: {
         templateVariables:
           "What did you enjoy about the event?\n\nPlease share a few words or a voicenote :)",
-        mediaId: "1K0r1c4cPNxmso92yK1IoQbTF4PpXEhAK",
+        mediaId: "1kVjMHI1oE3XEdiW-h0Duu-_lX0kvl-n9", //Q1
       },
       responseType: "template",
       templateKey: "survey_image",
@@ -328,7 +328,7 @@ const fatMacysSurveyConfig2 = {
       responseContent: {
         templateVariables:
           "Final question! Do you have any feedback, thoughts or ideas for Fat Macy's trainee socials?\n\nPlease share a few words or a voicenote :) ",
-        mediaId: "1K0r1c4cPNxmso92yK1IoQbTF4PpXEhAK",
+        mediaId: "1r0sQ8I6Dp4omJR4s7BSl6fWDDSiVH-5V", //q6
       },
       responseType: "template",
       templateKey: "survey_image",
@@ -338,7 +338,7 @@ const fatMacysSurveyConfig2 = {
       responseContent: {
         templateVariables:
           "Great - thanks so much for sharing!\n\nWish you a great week ahead",
-        mediaId: "1K0r1c4cPNxmso92yK1IoQbTF4PpXEhAK",
+        mediaId: "182GSiDvpjI7zFyJETt9W7ATeXErHkYDc",
       },
       responseType: "template",
       templateKey: "survey_image",
@@ -347,7 +347,7 @@ const fatMacysSurveyConfig2 = {
     10: {
       responseContent: {
         templateVariables: "No problem!\n\nHave a great day!",
-        mediaId: "1K0r1c4cPNxmso92yK1IoQbTF4PpXEhAK",
+        mediaId: "182GSiDvpjI7zFyJETt9W7ATeXErHkYDc",
       },
       responseType: "template",
       templateKey: "survey_image",

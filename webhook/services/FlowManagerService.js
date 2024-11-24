@@ -43,6 +43,12 @@ class FlowManagerService {
     2: "detailValue",
   };
 
+  static SOCIAL_SURVEY_PATH_CONFIG = {
+    "graduation-event": 3,
+    "end-of-year-social&&graduation-event": 3,
+    "end-of-year-social": 6,
+    "!end-of-year-social&&!graduation-event": 10,
+  };
   static ENHAM_SERVICE_OPTIONS = [
     "ask_questions",
     "training_and_quizzes",
@@ -63,7 +69,7 @@ class FlowManagerService {
    *         otherwise returns `false`.
    */
 
-  static incrementSectionConditions(data, buttonPayload) {
+  static incrementConditions(data, buttonPayload) {
     if (data.flowName === "survey") {
       return (
         buttonPayload.split("-")[1] ===
@@ -76,6 +82,8 @@ class FlowManagerService {
       );
     } else if (data.flowName === "enham-quiz-shelter-moneyhelper") {
       return data.flowSection == 1 && data.flowStep === 2;
+    } else if (data.flowName === "fm-social-survey") {
+      return data.flowStep === 2 || data.flowStep === 3;
     }
   }
   constructor(db) {
@@ -341,7 +349,7 @@ class FlowManagerService {
       if (!currentFlowSnapshot.empty) {
         const firstDoc = currentFlowSnapshot.docs[0];
         const data = firstDoc.data();
-        const incrementSection = FlowManagerService.incrementSectionConditions(
+        const incrementSection = FlowManagerService.incrementConditions(
           data,
           buttonPayload
         );
@@ -365,54 +373,59 @@ class FlowManagerService {
       throw new Error("Error in getting current flow");
     }
   }
+  /**
+   * Routes the survey based on the current flow state and button payload.
+   * @param {Object} params - Parameters for routing the survey.
+   * @param {string} params.WaId - User's WhatsApp ID.
+   * @param {number} params.flowStep - Current flow step.
+   * @param {string} params.userSelection - User's selection value.
+   * @param {string} params.buttonPayload - Payload data from the button selection.
+   * @returns {Promise<Object|null>} Updated flow data or null if no changes.
+   * @throws Will throw an error if any operation fails.
+   */
   async routeSurvey({ WaId, flowStep, userSelection, buttonPayload }) {
-    console.log("route survey called", {
-      WaId,
-      flowStep,
-      userSelection,
-      buttonPayload,
-    });
-    const currentFlowSnapshot = await this.db
-      .collection("flows")
-      .where("userId", "==", WaId)
-      .get();
-    if (!currentFlowSnapshot.empty) {
+    try {
+      const currentFlowSnapshot = await this.db
+        .collection("flows")
+        .where("userId", "==", WaId)
+        .get();
+
+      if (currentFlowSnapshot.empty) {
+        console.warn(`No flow found for user: ${WaId}`);
+        return null;
+      }
+
       const firstDoc = currentFlowSnapshot.docs[0];
-      const data = firstDoc.data();
-      const updateId = firstDoc.id;
+      const flowData = firstDoc.data();
+      const flowDocRef = this.db.collection("flows").doc(firstDoc.id);
+
+      if (!FlowManagerService.incrementConditions(flowData, buttonPayload)) {
+        return flowData; // No increment conditions met, return the current flow data.
+      }
+
+      let updatedFlowData = { ...flowData };
+
       if (flowStep === 2) {
-        const pathConfig = {
-          "graduation-event": 3,
-          "end-of-year-social&&graduation-event": 3,
-          "end-of-year-social": 6,
-          "!end-of-year-social&&!graduation-event": 10,
-        };
-        await this.db
-          .collection("flows")
-          .doc(updateId)
-          .update({ "flowStep": pathConfig[userSelection] });
-        const updatedDoc = await this.db
-          .collection("flows")
-          .doc(updateId)
-          .get();
-        return updatedDoc.data();
+        const newStep =
+          FlowManagerService.SOCIAL_SURVEY_PATH_CONFIG[userSelection];
+        if (newStep) {
+          await flowDocRef.update({ flowStep: newStep });
+          updatedFlowData.flowStep = newStep;
+        }
       } else if (flowStep === 3) {
-        console.log("btn payload", buttonPayload);
         if (buttonPayload.split("-")[0] === "no") {
-          await this.db
-            .collection("flows")
-            .doc(updateId)
-            .update({ "flowStep": 5 });
-          const updatedDoc = await this.db
-            .collection("flows")
-            .doc(updateId)
-            .get();
-          return updatedDoc.data();
+          await flowDocRef.update({ flowStep: 5 });
+          updatedFlowData.flowStep = 5;
         }
       }
-      return data;
+
+      return updatedFlowData;
+    } catch (err) {
+      console.error("Error in routeSurvey:", err);
+      throw new Error("Failed to route survey");
     }
   }
+
   async updateEnhamServiceSelection({ flowId, buttonPayload }) {
     const flowRef = this.db.collection("flows").doc(flowId);
     if (!FlowManagerService.ENHAM_SERVICE_OPTIONS.includes(buttonPayload)) {
