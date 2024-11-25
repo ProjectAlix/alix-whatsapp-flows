@@ -649,9 +649,16 @@ class FMSocialSurveyFlow extends SurveyBaseFlow {
       return flowCompletionStatus;
     }
     if (flowStep === 1) {
-      await this.saveAndSendTemplateMessage({
-        templateKey: "fm_social_survey_intro",
-      });
+      // await this.saveAndSendTemplateMessage({
+      //   templateKey: "fm_social_survey_intro",
+      // });
+      this.userMessage?.isReminder
+        ? await this.saveAndSendTemplateMessage({
+            templateKey: "survey_reminder",
+          })
+        : await this.saveAndSendTemplateMessage({
+            templateKey: "fm_social_survey_intro",
+          });
     } else {
       const { responseContent, responseType, templateKey } =
         fatMacysSurveyConfig2[flowSection][flowStep];
