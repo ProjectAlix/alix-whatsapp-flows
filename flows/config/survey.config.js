@@ -317,7 +317,7 @@ const fatMacysSurveyConfig2 = {
     7: {
       responseContent: {
         templateVariables:
-          "What did you enjoy about the event?\n\nPlease share a few words or a voicenote :)",
+          "What did you enjoy about the event?\n\nAka meeting others, seeing the team, celebrating or anything else?\n\nPlease share a few words or a voicenote :)",
         mediaId: "1kVjMHI1oE3XEdiW-h0Duu-_lX0kvl-n9", //Q1
       },
       responseType: "template",
@@ -327,7 +327,7 @@ const fatMacysSurveyConfig2 = {
     8: {
       responseContent: {
         templateVariables:
-          "Final question! Do you have any feedback, thoughts or ideas for Fat Macy's trainee socials?\n\nPlease share a few words or a voicenote :) ",
+          "Final question! Do you have any feedback, thoughts or ideas for Fat Macy's trainee socials?\n\nAka venues, activities, time of day / week / year, any other suggestions?\n\nPlease share a few words or a voicenote :) ",
         mediaId: "1r0sQ8I6Dp4omJR4s7BSl6fWDDSiVH-5V", //q6
       },
       responseType: "template",

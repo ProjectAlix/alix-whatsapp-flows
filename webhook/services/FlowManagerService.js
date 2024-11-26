@@ -83,7 +83,7 @@ class FlowManagerService {
     } else if (data.flowName === "enham-quiz-shelter-moneyhelper") {
       return data.flowSection == 1 && data.flowStep === 2;
     } else if (data.flowName === "fm-social-survey") {
-      return data.flowStep === 2 || data.flowStep === 3;
+      return data.flowStep === 3 || data.flowStep === 4 || data.flowStep === 5;
     }
   }
   constructor(db) {
@@ -384,6 +384,7 @@ class FlowManagerService {
    * @throws Will throw an error if any operation fails.
    */
   async routeSurvey({ WaId, flowStep, userSelection, buttonPayload }) {
+    console.log("CURRENT FLOW STEP", flowStep);
     try {
       const currentFlowSnapshot = await this.db
         .collection("flows")
@@ -404,7 +405,7 @@ class FlowManagerService {
       }
 
       let updatedFlowData = { ...flowData };
-
+      //TO-DO clean this ew
       if (flowStep === 2) {
         const newStep =
           FlowManagerService.SOCIAL_SURVEY_PATH_CONFIG[userSelection];
@@ -417,6 +418,10 @@ class FlowManagerService {
           await flowDocRef.update({ flowStep: 5 });
           updatedFlowData.flowStep = 5;
         }
+      } else if (flowStep === 4) {
+        console.log("being updated...");
+        await flowDocRef.update({ flowStep: 6 });
+        updatedFlowData.flowStep = 6;
       }
 
       return updatedFlowData;
