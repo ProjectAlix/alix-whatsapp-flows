@@ -67,7 +67,9 @@ class InboundMessageHandler extends BaseMessageHandler {
       // get the contact information from the database (if the user has messaged the number previously their details will have been stored)
       const registeredUser = await this.databaseService.getUser(
         this.body.WaId,
-        this.organizationPhoneNumber
+
+        this.organizationPhoneNumber,
+        this.body.ProfileName
       );
       const userInfo = registeredUser || {
         //extract user information to be used in the flows later and sent to the Flows microservice

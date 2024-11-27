@@ -187,6 +187,7 @@ class DatabaseService {
       throw err;
     }
   }
+  //67066b4bc506e2fd89e999f7
   /**
    * Retrieves a user by their WhatsApp ID within a specific organization.
    * @param {string} recipient - The WhatsApp ID of the user.
