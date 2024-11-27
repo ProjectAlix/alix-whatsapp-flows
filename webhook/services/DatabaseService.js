@@ -133,10 +133,10 @@ class DatabaseService {
    * @param {ObjectId} contactId - The ID of the contact to add.
    * @returns {Promise<void>}
    */
-  async updateOrganizationWithContact(organizationNumber, contactId) {
+  async updateOrganizationWithContact(organizationId, contactId) {
     try {
       await this.organizationCollection.updateOne(
-        { "organizationPhoneNumber": organizationNumber },
+        { "_id": new ObjectId(organizationId) },
         {
           $push: {
             organizationContacts: contactId,
@@ -170,32 +170,18 @@ class DatabaseService {
    * @param {string} organizationNumber - The phone number of the organization the user is associated with.
    * @returns {Promise<void>}
    */
-  async saveUser(userData, organizationNumber) {
+  async saveUser(userData, organizationId) {
     try {
-      const user = await this.contactCollection.findOne({
-        "WaId": userData.WaId,
-      });
-
-      if (user) {
-        return;
-      }
-
-      const organization = await this.getOrganization(organizationNumber);
-
-      if (!organization) {
-        throw new Error("Organization not found");
-      }
-
       const result = await this.contactCollection.insertOne({
         "WaId": userData.WaId,
         "ProfileName": userData.ProfileName,
-        "organizationId": organization._id,
+        "organizationId": organizationId,
         "CreatedAt": new Date(),
         "LastSeenAt": new Date(),
       });
 
       const insertedId = result.insertedId;
-      await this.updateOrganizationWithContact(organizationNumber, insertedId);
+      await this.updateOrganizationWithContact(organizationId, insertedId);
     } catch (err) {
       console.error(err);
       throw err;
@@ -207,7 +193,7 @@ class DatabaseService {
    * @param {string} organizationPhoneNumber - The phone number of the organization the user belongs to.
    * @returns {Promise<Object|null>} The user document or null if not found.
    */
-  async getUser(recipient, organizationPhoneNumber) {
+  async getUser(WaId, organizationPhoneNumber, ProfileName = null) {
     try {
       const userOrganization = await this.getOrganization(
         organizationPhoneNumber
@@ -215,9 +201,12 @@ class DatabaseService {
       console.log(userOrganization);
       const userOrganizationId = userOrganization._id;
       const user = await this.contactCollection.findOne({
-        "WaId": recipient,
+        "WaId": WaId,
         "organizationId": userOrganizationId,
       });
+      if (!user) {
+        await this.saveUser({ WaId, ProfileName }, userOrganizationId);
+      }
       return user;
     } catch (err) {
       console.error(err);

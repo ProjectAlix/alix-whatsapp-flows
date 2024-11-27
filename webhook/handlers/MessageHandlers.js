@@ -22,7 +22,8 @@ class InboundMessageHandler extends BaseMessageHandler {
   static SEE_MORE_OPTIONS_MESSAGES = [
     "See More Options",
     "That's great, thanks",
-  ]; //TO-DO refactor to use button id
+  ];
+
   /**
    * Creates an instance of InboundMessageHandler.
    * @constructor
@@ -91,22 +92,20 @@ class InboundMessageHandler extends BaseMessageHandler {
         return this.res.status(204).send();
       }
       //check if the text of the first message is a preconfigured "trigger" message for a flow to start
-      //TO-DO clean up
-      if (!registeredUser || this.body.Body === "test") {
-        await this.onboardUser(userInfo, messageToSave);
-      } else if (this.isSignpostingTrigger()) {
-        await this.startSignpostingFlow(userInfo, messageToSave);
-      } else if (this.isEditDetailsTrigger()) {
-        await this.startEditDetailsFlow(userInfo, messageToSave);
-      } else if (this.isSurveyTrigger()) {
-        await this.startFatMacysSurveyFlow(userInfo, messageToSave);
-      } else if (this.isEnhamComboTrigger()) {
-        await this.startEnhamComboFlow(userInfo, messageToSave);
+      const flowTriggers = {
+        "hi": this.startSignpostingFlow,
+        "edit details": this.startEditDetailsFlow,
+        "survey": this.startFatMacysSurveyFlow,
+        "enham": this.startEnhamComboFlow,
+        "social survey": this.startFMSocialSurveyFlow,
+        "test": this.onboardUser,
+      };
+      const trigger = this.body.Body.toLowerCase().trim();
+      if (flowTriggers[trigger]) {
+        await flowTriggers[trigger].call(this, userInfo, messageToSave);
       } else if (this.isSampleTrigger()) {
         const sampleVersion = this.body.Body.split("-")[1];
         await this.startSampleFlow(userInfo, messageToSave, sampleVersion);
-      } else if (this.isFMSocialSurveyTrigger()) {
-        await this.startFMSocialSurveyFlow(userInfo, messageToSave);
       } else {
         //if not a "trigger" message, calls handleExistingFlow
         /**
@@ -147,7 +146,6 @@ class InboundMessageHandler extends BaseMessageHandler {
    * Starts a specific flow based on the user data and message information.
    *
    * @param {Object} params - Parameters for starting the flow.
-   *
    * @param {Object} params.userInfo - The user data object.
    * @param {ObjectId} params.userInfo._id - Unique identifier for the user.
    * @param {string} params.userInfo.WaId - WhatsApp ID of the user.
@@ -245,14 +243,12 @@ class InboundMessageHandler extends BaseMessageHandler {
    * @param {Object} messageToSave - Message data to be saved to the database and used for onboarding.
    *
    * Calls:
-   * - `databaseService.saveUser`: Saves the user data to the database.
    * - `startFlow`: Initiates the "onboarding" flow with the provided user and message data.
    *
    * @returns {Promise<void>} - Resolves when the user is successfully onboarded and the flow is started.
    */
 
   async onboardUser(userInfo, messageToSave) {
-    await this.databaseService.saveUser(userInfo, this.organizationPhoneNumber);
     await this.startFlow({ userInfo, messageToSave, flowName: "onboarding" });
   }
 
