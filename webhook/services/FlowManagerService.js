@@ -86,6 +86,7 @@ class FlowManagerService {
       return data.flowStep === 3 || data.flowStep === 4 || data.flowStep === 5;
     }
   }
+
   constructor(db) {
     /**
      * @constructor
@@ -340,7 +341,11 @@ class FlowManagerService {
    * @returns {Promise<Object|null>} Updated flow data or null if no changes.
    * @throws Will throw an error if the flow retrieval or update fails.
    */
-  async createNextSectionUpdate({ WaId, buttonPayload }) {
+  async createNextSectionUpdate({
+    WaId,
+    buttonPayload,
+    additionalUpdates = {},
+  }) {
     try {
       const currentFlowSnapshot = await this.db
         .collection("flows")
@@ -358,10 +363,12 @@ class FlowManagerService {
         }
         const updateId = firstDoc.id;
         const currentSection = data.flowSection;
-        await this.db
-          .collection("flows")
-          .doc(updateId)
-          .update({ "flowStep": 1, "flowSection": currentSection + 1 });
+        const updatePayload = {
+          "flowStep": 1,
+          "flowSection": currentSection + 1,
+          ...additionalUpdates,
+        };
+        await this.db.collection("flows").doc(updateId).update(updatePayload);
         const updatedDoc = await this.db
           .collection("flows")
           .doc(updateId)
@@ -384,7 +391,6 @@ class FlowManagerService {
    * @throws Will throw an error if any operation fails.
    */
   async routeSurvey({ WaId, flowStep, userSelection, buttonPayload }) {
-    console.log("CURRENT FLOW STEP", flowStep);
     try {
       const currentFlowSnapshot = await this.db
         .collection("flows")
@@ -419,7 +425,6 @@ class FlowManagerService {
           updatedFlowData.flowStep = 5;
         }
       } else if (flowStep === 4) {
-        console.log("being updated...");
         await flowDocRef.update({ flowStep: 6 });
         updatedFlowData.flowStep = 6;
       }
@@ -431,10 +436,12 @@ class FlowManagerService {
     }
   }
 
-  async updateEnhamServiceSelection({ flowId, buttonPayload }) {
+  async createEnhamServiceSelection({ flowId, buttonPayload }) {
     const flowRef = this.db.collection("flows").doc(flowId);
+    console.log(buttonPayload, flowRef);
     if (!FlowManagerService.ENHAM_SERVICE_OPTIONS.includes(buttonPayload)) {
-      return flowRef.data();
+      const currentData = await flowRef.get();
+      return currentData.data();
     }
     await flowRef.update({ serviceSelection: buttonPayload });
     const updatedDoc = await flowRef.get();
@@ -443,6 +450,7 @@ class FlowManagerService {
   }
 }
 
+//TO-DO remove duplicate db calls
 module.exports = {
   FlowManagerService,
 };

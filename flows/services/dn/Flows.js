@@ -288,7 +288,7 @@ class SignpostingFlow extends BaseFlow {
           category: category,
         };
         console.log("sent to llm", JSON.stringify(aiApiRequest));
-        const response = await llmService.make_llm_request(aiApiRequest);
+        const response = await llmService.make_llm_request(aiApiRequest); //TO-DO refactor to use some sort of task parameter
         const llmResponse = response.data;
         const firstText = "Here are some support options:";
         const firstMessage = createTextMessage({
@@ -566,7 +566,7 @@ class EnhamComboFlow extends BaseFlow {
   static SERVICE_OPTIONS = [
     "ask_questions",
     "training_and_quizzes",
-    "documents_sign",
+    // "documents_sign", add later
   ];
   constructor({
     userInfo,
@@ -583,14 +583,45 @@ class EnhamComboFlow extends BaseFlow {
       organizationMessagingServiceSid,
     });
   }
-  async handleFlowStep(flowStep, flowSection) {
+  async handleFlowStep(flowStep, flowSection, serviceSelection, llmService) {
     let flowCompletionStatus = false;
     if (flowSection === 1) {
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_start",
       });
     } else if (flowSection === 2) {
-      if (this.buttonPayload === EnhamComboFlow.SERVICE_OPTIONS[1]) {
+      if (serviceSelection === EnhamComboFlow.SERVICE_OPTIONS[0]) {
+        if (flowStep === 1) {
+          const questionMessage = createTextMessage({
+            waId: this.WaId,
+            textContent: "What can I help you with?",
+            messagingServiceSid: this.messagingServiceSid,
+          });
+          await this.saveAndSendTextMessage(
+            questionMessage,
+            EnhamComboFlow.FLOW_NAME
+          );
+        } else if (flowStep === 2) {
+          const aiApiRequest = {
+            user_message: this.messageContent,
+          };
+          const response = await llmService.make_llm_request(
+            aiApiRequest,
+            "enham-qa"
+          );
+          const llmAnswer = response.data;
+          const answerMessage = createTextMessage({
+            waId: this.WaId,
+            textContent: llmAnswer,
+            messagingServiceSid: this.messagingServiceSid,
+          });
+          await this.saveAndSendTextMessage(
+            answerMessage,
+            EnhamComboFlow.FLOW_NAME
+          );
+        }
+      }
+      if (serviceSelection === EnhamComboFlow.SERVICE_OPTIONS[1]) {
         //quiz here
         if (flowStep === 1) {
           const messageTexts = [
@@ -649,9 +680,6 @@ class FMSocialSurveyFlow extends SurveyBaseFlow {
       return flowCompletionStatus;
     }
     if (flowStep === 1) {
-      // await this.saveAndSendTemplateMessage({
-      //   templateKey: "fm_social_survey_intro",
-      // });
       this.userMessage?.isReminder
         ? await this.saveAndSendTemplateMessage({
             templateKey: "survey_reminder",

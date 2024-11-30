@@ -1,6 +1,7 @@
 from dotenv import load_dotenv
 from typing import List, Dict, Any, Optional
 import vertexai
+from ..config.openai_config import openai
 from abc import ABC
 import json
 from vertexai.generative_models import (
@@ -10,8 +11,10 @@ from vertexai.generative_models import (
     Tool, GenerativeModel
 )
 from ..config.vertexai_config import vertexai_project_location, vertex_ai_project_id
+import os
+import time
 load_dotenv()
-
+ENHAM_ASSISTANT_ID=os.environ.get("ENHAM_ASSISTANT_ID")
 
 class AI_Service(ABC):
     """
@@ -21,13 +24,15 @@ class AI_Service(ABC):
         model (GenerativeModel): The generative model instance initialized for the service.
     """
 
-    def __init__(self, model_source, model_name):
+    def __init__(self, model_source, model_name=None):
         self.model = self.create_model(model_source, model_name)
 
-    def create_model(self, model_source, model_name):
+    def create_model(self, model_source, model_name=None):
         if model_source == "vertexai":
             vertexai.init(project=vertex_ai_project_id, location=vertexai_project_location)
             return GenerativeModel(model_name)
+        elif model_source=="openai":
+            return openai
         else:
             raise ValueError(f"Unsupported model source: {model_source}")
         
@@ -168,6 +173,56 @@ class VertexAI_Service(AI_Service):
             model_responses.append(final_response)
         return model_responses
             
+class OpenAI_Service(AI_Service):
+    ASSISTANT_IDS={
+        "enham": ENHAM_ASSISTANT_ID
+    }
+    def __init__(self, model_source: str):
+        super().__init__(model_source)
+
+    @staticmethod
+    def select_assistant(service):
+        return OpenAI_Service.ASSISTANT_IDS[service]
+    
+    def create_thread(self, user_message: str)->str:
+        thread=self.model.beta.threads.create(messages=[
+            {
+                "role":"user", 
+                "content": user_message
+            }
+        ])
+        return thread.id
+    def create_run(self, service, thread_id)->dict:
+        """
+        Creates and polls a run for the given thread ID using the assistant ID.
+
+        Args:
+            service (str): The service name to fetch the assistant ID.
+            thread_id (str): The ID of the thread to create a run for.
+
+        Returns:
+            dict: The list of messages in the thread upon completion.
+        """
+        assistant_id=self.select_assistant(service)
+        run=self.model.beta.threads.runs.create_and_poll(thread_id=thread_id, assistant_id=assistant_id)
+        while run.status !="completed":
+            print(f"Run status: {run.status}")
+            time.sleep(1)
+            run=self.model.beta.threads.runs.retrieve(run_id=run.id, thread_id=thread_id)
+        
+        response=self.model.beta.threads.messages.list(thread_id=thread_id)
+        return response
+        
+    
+
+    
 
 
+
+
+
+
+
+
+    
 

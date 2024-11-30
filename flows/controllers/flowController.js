@@ -110,10 +110,12 @@ async function flowController(req, res, next) {
         cancelSurvey,
       });
     } else if (flow === "enham-quiz-shelter-moneyhelper") {
+      const serviceSelection = req.body.serviceSelection;
       flowCompletionStatus = await runEnhamComboFlow({
         flowConstructorParams,
         flowStep,
         flowSection,
+        serviceSelection,
       });
     }
     res.status(200).send({ flowCompletionStatus });

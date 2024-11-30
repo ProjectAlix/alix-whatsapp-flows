@@ -1,7 +1,8 @@
 from fastapi import APIRouter
 from typing import List
-from ..models.RequestModel import RequestModel
-from ..services.AI_Service import VertexAI_Service
+from ..models.SignpostingRequestModel import SignpostingRequestModel
+from ..models.EnhamQaRequestModel import EnhamQaRequestModel
+from ..services.AI_Service import VertexAI_Service, OpenAI_Service
 from ..services.TranslationService import TranslationService
 from ..utils.formatting import create_input_text
 router=APIRouter(
@@ -9,7 +10,7 @@ router=APIRouter(
 )
 
 @router.post("/")
-def call_llm(request_body: RequestModel)->List[str]:
+def describe_signposting_options(request_body: SignpostingRequestModel)->List[str]:
     """
     Processes input through a Language Model (LLM) and returns the generated messages (descriptions for signposting options).
 
@@ -18,7 +19,7 @@ def call_llm(request_body: RequestModel)->List[str]:
     process the messages, and optionally translates the messages into a target language.
 
     Args:
-        request_body (RequestModel): The input payload containing user options, category, and language.
+        request_body (SignpostingRequestModel): The input payload containing user options, category, and language.
 
     Returns:
         list[str]: A list of processed and optionally translated messages.
@@ -68,3 +69,11 @@ def call_llm(request_body: RequestModel)->List[str]:
         messages=[TranslationService(request_body.language).translate_text(message) for message in messages]
     print(messages)
     return messages
+
+@router.post("/enham-qa")
+def answer_enham_qa(request_body: EnhamQaRequestModel):
+    llm=OpenAI_Service("openai")
+    thread_id=llm.create_thread(user_message=request_body.user_message)
+    response=llm.create_run("enham", thread_id)
+    print(response)
+    return response.data[0].content[0].text.value

@@ -42,6 +42,7 @@ async function runEnhamComboFlow({
   flowConstructorParams,
   flowStep,
   flowSection,
+  serviceSelection,
 }) {
   const {
     userInfo,
@@ -57,9 +58,12 @@ async function runEnhamComboFlow({
     organizationPhoneNumber,
     organizationMessagingServiceSid,
   });
+  const llmService = new LLMService(api_base);
   const flowCompletionStatus = await enhamComboFlow.handleFlowStep(
     flowStep,
-    flowSection
+    flowSection,
+    serviceSelection,
+    llmService
   );
   return flowCompletionStatus;
 }

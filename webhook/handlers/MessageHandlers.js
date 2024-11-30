@@ -67,7 +67,6 @@ class InboundMessageHandler extends BaseMessageHandler {
       // get the contact information from the database (if the user has messaged the number previously their details will have been stored)
       const registeredUser = await this.databaseService.getUser(
         this.body.WaId,
-
         this.organizationPhoneNumber,
         this.body.ProfileName
       );
@@ -124,26 +123,11 @@ class InboundMessageHandler extends BaseMessageHandler {
       this.res.status(500).send(err);
     }
   }
-  //functions to select the flow to start based off the inbound message
-  isSignpostingTrigger() {
-    return this.body.Body.toLowerCase().trim() === "hi";
-  }
 
-  isEditDetailsTrigger() {
-    return this.body.Body.toLowerCase().trim() === "edit details";
-  }
-  isSurveyTrigger() {
-    return this.body.Body.toLowerCase().trim() === "survey";
-  }
   isSampleTrigger() {
     return this.body.Body.toLowerCase().split("-")[0] === "sample";
   }
-  isEnhamComboTrigger() {
-    return this.body.Body.toLowerCase().trim() === "enham";
-  }
-  isFMSocialSurveyTrigger() {
-    return this.body.Body.toLowerCase().trim() === "social survey";
-  }
+
   /**
    * Starts a specific flow based on the user data and message information.
    *
@@ -414,17 +398,15 @@ class InboundMessageHandler extends BaseMessageHandler {
         this.body.MessageSid
       );
       messageData.cancelSurvey = await this.updateSurveyCancellation(flowId);
-
-      const updatedDoc = await this.flowManagerService.createNextSectionUpdate({
-        WaId: this.body.WaId,
-        buttonPayload: this.buttonPayload,
-      });
-      messageData.flowSection = updatedDoc.flowSection;
-      messageData.flowStep = updatedDoc.flowStep;
+      const { flowSection, flowStep } =
+        await this.flowManagerService.createNextSectionUpdate({
+          WaId: this.body.WaId,
+          buttonPayload: this.buttonPayload,
+        });
+      messageData.flowSection = flowSection;
+      messageData.flowStep = flowStep;
       const { questionContent, questionNumber } =
-        fatMacysSurveyConfig1?.[updatedDoc.flowSection]?.[
-          updatedDoc.flowStep
-        ] || {};
+        fatMacysSurveyConfig1?.[flowSection]?.[flowStep] || {};
       if (questionContent && questionNumber) {
         await this.databaseService.updateFlowSurvey(flowId, {
           questionContent,
@@ -432,12 +414,18 @@ class InboundMessageHandler extends BaseMessageHandler {
         });
       }
     } else if (flowName === "enham-quiz-shelter-moneyhelper") {
-      const updatedDoc = await this.flowManagerService.createNextSectionUpdate({
-        WaId: this.body.WaId,
-        buttonPayload: this.buttonPayload,
-      });
-      messageData.flowSection = updatedDoc.flowSection;
-      messageData.flowStep = updatedDoc.flowStep;
+      const { flowSection, flowStep } =
+        await this.flowManagerService.createNextSectionUpdate({
+          WaId: this.body.WaId,
+          buttonPayload: this.buttonPayload,
+        });
+      messageData.serviceSelection = await this.updateEnhamServiceSelection(
+        flowId,
+        flowSection,
+        flowStep
+      );
+      messageData.flowSection = flowSection;
+      messageData.flowStep = flowStep;
     } else if (flowName === "fm-social-survey") {
       const response = formatFirstSocialSurveyResponse(this.body.Body);
       await this.databaseService.updateFlowWithResponse(
@@ -517,7 +505,7 @@ class InboundMessageHandler extends BaseMessageHandler {
 
   async updateEnhamServiceSelection(flowId) {
     const updatedDoc =
-      await this.flowManagerService.updateEnhamServiceSelection({
+      await this.flowManagerService.createEnhamServiceSelection({
         flowId,
         buttonPayload: this.buttonPayload,
       });
@@ -631,7 +619,8 @@ class OutboundFlowHandler extends BaseMessageHandler {
   async handleBulkMessages(WaId, ProfileName, organizationPhoneNumber) {
     const registeredUser = await this.databaseService.getUser(
       WaId,
-      organizationPhoneNumber
+      organizationPhoneNumber,
+      ProfileName
     );
 
     if (!this.flow.isSendable) {
