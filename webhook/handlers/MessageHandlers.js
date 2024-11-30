@@ -24,6 +24,7 @@ class InboundMessageHandler extends BaseMessageHandler {
     "That's great, thanks",
   ];
 
+  static REPEAT_ENHAM_QA_MESSAGE = "yes-enham_qa";
   /**
    * Creates an instance of InboundMessageHandler.
    * @constructor
@@ -362,11 +363,17 @@ class InboundMessageHandler extends BaseMessageHandler {
     const currentFlow = await this.flowManagerService.getCurrentFlow(userInfo);
     const { flowName, flowStep, id: flowId } = currentFlow;
     let updatedFlowStep = flowStep;
+
     if (
-      !InboundMessageHandler.SEE_MORE_OPTIONS_MESSAGES.includes(this.body.Body)
+      !InboundMessageHandler.SEE_MORE_OPTIONS_MESSAGES.includes(
+        this.body.Body
+      ) &&
+      InboundMessageHandler.REPEAT_ENHAM_QA_MESSAGE !== this.buttonPayload
     ) {
+      console.log("HERE");
       updatedFlowStep += 1; //Signposting flow specific bit of logic, advances the current flow step for all other flows, handles the pagination of search results in signposting
     } //This is some technical debt, honestly not sure whats happening here but its not hurting anyone so
+    console.log("UPDATED FLOW STEP", updatedFlowStep);
     const messageData = await this.createMessageData({
       userInfo,
       flowName,
@@ -503,6 +510,11 @@ class InboundMessageHandler extends BaseMessageHandler {
     return updatedDoc.cancelSurvey;
   }
 
+  /**
+   * Handles button selection for the Enham flow
+   * @param {string} flowId - The unique flow ID.
+   * @returns {Promise<string>} - The updated Enham flow service selection (either ask_questions, quiz or undefined).
+   */
   async updateEnhamServiceSelection(flowId) {
     const updatedDoc =
       await this.flowManagerService.createEnhamServiceSelection({

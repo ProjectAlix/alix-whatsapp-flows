@@ -359,6 +359,7 @@ class FlowManagerService {
           buttonPayload
         );
         if (!incrementSection) {
+          console.log("in next section update", data);
           return data;
         }
         const updateId = firstDoc.id;
@@ -438,7 +439,6 @@ class FlowManagerService {
 
   async createEnhamServiceSelection({ flowId, buttonPayload }) {
     const flowRef = this.db.collection("flows").doc(flowId);
-    console.log(buttonPayload, flowRef);
     if (!FlowManagerService.ENHAM_SERVICE_OPTIONS.includes(buttonPayload)) {
       const currentData = await flowRef.get();
       return currentData.data();

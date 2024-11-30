@@ -605,11 +605,11 @@ class EnhamComboFlow extends BaseFlow {
           const aiApiRequest = {
             user_message: this.messageContent,
           };
-          const response = await llmService.make_llm_request(
-            aiApiRequest,
-            "enham-qa"
-          );
-          const llmAnswer = response.data;
+          // const response = await llmService.make_llm_request(
+          //   aiApiRequest,
+          //   "enham-qa"
+          // );
+          const llmAnswer = "...";
           const answerMessage = createTextMessage({
             waId: this.WaId,
             textContent: llmAnswer,
@@ -619,6 +619,12 @@ class EnhamComboFlow extends BaseFlow {
             answerMessage,
             EnhamComboFlow.FLOW_NAME
           );
+          await this.saveAndSendTemplateMessage({
+            templateKey: "enham_qa_followup",
+            templateVariables: {
+              follow_up_question: "Would you like to ask anything else?",
+            },
+          });
         }
       }
       if (serviceSelection === EnhamComboFlow.SERVICE_OPTIONS[1]) {
