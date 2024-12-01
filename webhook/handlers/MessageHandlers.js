@@ -349,7 +349,11 @@ class InboundMessageHandler extends BaseMessageHandler {
    */
   async handleExistingFlow(userInfo, messageToSave) {
     //retrieve current flow from Firestore
-    const currentFlow = await this.flowManagerService.getCurrentFlow(userInfo);
+    const currentFlow = await this.flowManagerService.getCurrentFlow(
+      userInfo,
+      this.body.Body,
+      this.buttonPayload
+    );
     const { flowName, flowStep, id: flowId } = currentFlow;
 
     const messageData = await this.createMessageData({

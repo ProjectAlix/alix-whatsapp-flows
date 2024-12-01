@@ -605,11 +605,11 @@ class EnhamComboFlow extends BaseFlow {
           const aiApiRequest = {
             user_message: this.messageContent,
           };
-          // const response = await llmService.make_llm_request(
-          //   aiApiRequest,
-          //   "enham-qa"
-          // );
-          const llmAnswer = "...";
+          const response = await llmService.make_llm_request(
+            aiApiRequest,
+            "enham-qa"
+          );
+          const llmAnswer = response.data;
           const answerMessage = createTextMessage({
             waId: this.WaId,
             textContent: llmAnswer,

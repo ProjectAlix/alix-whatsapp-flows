@@ -178,12 +178,15 @@ class FlowManagerService {
         .get();
       if (!currentFlowSnapshot.empty) {
         const shouldUpdate =
-          !FlowManagerService.SEE_MORE_OPTIONS_MESSAGES.includes(messageBody) &&
-          FlowManagerService.REPEAT_ENHAM_QA_MESSAGE !== buttonPayload;
+          !FlowManagerService.SEE_MORE_OPTIONS_MESSAGES.includes(messageBody);
         const firstDoc = currentFlowSnapshot.docs[0];
         const data = firstDoc.data();
         const updateId = firstDoc.id;
-        const updatedFlowStep = data.flowStep + 1;
+        //TO-DO no just no
+        const updatedFlowStep =
+          FlowManagerService.REPEAT_ENHAM_QA_MESSAGE !== buttonPayload
+            ? data.flowStep + 1
+            : data.flowStep - 1;
         data.id = updateId;
         if (shouldUpdate) {
           await this.db
