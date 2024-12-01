@@ -33,6 +33,18 @@ class FlowManagerService {
     2: "category",
     3: "location",
   };
+
+  /**
+   * @static
+   * @type {Array<string>}
+   * @description Predefined messages to determine whether to paginate the results returned to the user during the signposting flow (getting next page)
+   */
+  static SEE_MORE_OPTIONS_MESSAGES = [
+    "See More Options",
+    "That's great, thanks",
+  ];
+
+  static REPEAT_ENHAM_QA_MESSAGE = "yes-enham_qa";
   /**
    * @static
    * @type {Object}
@@ -156,7 +168,8 @@ class FlowManagerService {
    * @returns {Promise<Object|null>} The current flow data or null if no flow exists.
    * @throws Will throw an error if retrieving the flow fails.
    */
-  async getCurrentFlow(userData) {
+  async getCurrentFlow(userData, messageBody, buttonPayload) {
+    //MOVE FLOW STEP INCREMENTING HERE
     try {
       const userId = userData.WaId;
       const currentFlowSnapshot = await this.db
@@ -164,17 +177,25 @@ class FlowManagerService {
         .where("userId", "==", userId)
         .get();
       if (!currentFlowSnapshot.empty) {
+        const shouldUpdate =
+          !FlowManagerService.SEE_MORE_OPTIONS_MESSAGES.includes(messageBody) &&
+          FlowManagerService.REPEAT_ENHAM_QA_MESSAGE !== buttonPayload;
         const firstDoc = currentFlowSnapshot.docs[0];
         const data = firstDoc.data();
         const updateId = firstDoc.id;
-        const currentStep = data.flowStep;
-        await this.db
-          .collection("flows")
-          .doc(updateId)
-          .update({ "flowStep": currentStep + 1 });
-        data.id = updateId; //add the id to the doc so that we can delete it by id later
+        const updatedFlowStep = data.flowStep + 1;
+        data.id = updateId;
+        if (shouldUpdate) {
+          await this.db
+            .collection("flows")
+            .doc(updateId)
+            .update({ "flowStep": updatedFlowStep });
+          //add the id to the doc so that we can delete it by id later
+          data.flowStep = updatedFlowStep;
+        }
         return data;
       }
+      return null;
     } catch (err) {
       console.error("An error occurred getting the current flow", err);
       throw new Error("Error in getting current flow");
@@ -359,7 +380,6 @@ class FlowManagerService {
           buttonPayload
         );
         if (!incrementSection) {
-          console.log("in next section update", data);
           return data;
         }
         const updateId = firstDoc.id;
@@ -413,19 +433,20 @@ class FlowManagerService {
 
       let updatedFlowData = { ...flowData };
       //TO-DO clean this ew
-      if (flowStep === 2) {
+      console.log("current flow step", flowStep);
+      if (flowStep === 3) {
         const newStep =
           FlowManagerService.SOCIAL_SURVEY_PATH_CONFIG[userSelection];
         if (newStep) {
           await flowDocRef.update({ flowStep: newStep });
           updatedFlowData.flowStep = newStep;
         }
-      } else if (flowStep === 3) {
+      } else if (flowStep === 4) {
         if (buttonPayload.split("-")[0] === "no") {
           await flowDocRef.update({ flowStep: 5 });
           updatedFlowData.flowStep = 5;
         }
-      } else if (flowStep === 4) {
+      } else if (flowStep === 5) {
         await flowDocRef.update({ flowStep: 6 });
         updatedFlowData.flowStep = 6;
       }

@@ -15,17 +15,6 @@ const {
  */
 class InboundMessageHandler extends BaseMessageHandler {
   /**
-   * @static
-   * @type {Array<string>}
-   * @description Predefined messages to determine whether to paginate the results returned to the user during the signposting flow (getting next page)
-   */
-  static SEE_MORE_OPTIONS_MESSAGES = [
-    "See More Options",
-    "That's great, thanks",
-  ];
-
-  static REPEAT_ENHAM_QA_MESSAGE = "yes-enham_qa";
-  /**
    * Creates an instance of InboundMessageHandler.
    * @constructor
    * @param {Object} params - Parameters for the handler.
@@ -362,23 +351,12 @@ class InboundMessageHandler extends BaseMessageHandler {
     //retrieve current flow from Firestore
     const currentFlow = await this.flowManagerService.getCurrentFlow(userInfo);
     const { flowName, flowStep, id: flowId } = currentFlow;
-    let updatedFlowStep = flowStep;
 
-    if (
-      !InboundMessageHandler.SEE_MORE_OPTIONS_MESSAGES.includes(
-        this.body.Body
-      ) &&
-      InboundMessageHandler.REPEAT_ENHAM_QA_MESSAGE !== this.buttonPayload
-    ) {
-      console.log("HERE");
-      updatedFlowStep += 1; //Signposting flow specific bit of logic, advances the current flow step for all other flows, handles the pagination of search results in signposting
-    } //This is some technical debt, honestly not sure whats happening here but its not hurting anyone so
-    console.log("UPDATED FLOW STEP", updatedFlowStep);
     const messageData = await this.createMessageData({
       userInfo,
       flowName,
       trackedFlowId: flowId,
-      flowStep: updatedFlowStep,
+      flowStep,
       flowSection: 1,
     });
     await this.databaseService.updateFlowStatus(flowId, "in_progress");
