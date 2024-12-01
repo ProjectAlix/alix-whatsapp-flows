@@ -587,6 +587,9 @@ class EnhamComboFlow extends BaseFlow {
     let flowCompletionStatus = false;
     if (flowSection === 1) {
       await this.saveAndSendTemplateMessage({
+        templateVariables: {
+          greeting: "Hi there, thanks for messaging Enham :) ",
+        },
         templateKey: "enham_start",
       });
     } else if (flowSection === 2) {

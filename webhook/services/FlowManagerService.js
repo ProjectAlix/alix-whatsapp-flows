@@ -50,6 +50,13 @@ class FlowManagerService {
    * @type {Object}
    * @description Predefined configuration for conducting a user detail update.
    */
+
+  static ENHAM_START_OVER_MESSAGE = "startover-enham_qa";
+  /**
+   * @static
+   * @type {Object}
+   * @description Predefined configuration for conducting a user detail update.
+   */
   static EDIT_DETAILS_QUERY_FIELDS = {
     1: "detailField",
     2: "detailValue",

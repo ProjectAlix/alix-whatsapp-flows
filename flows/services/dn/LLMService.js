@@ -3,7 +3,12 @@ class LLMService {
   constructor(api_base) {
     this.api_base = api_base;
   }
-  async make_llm_request(requestBody, path) {
+  async make_llm_request(requestBody, path, mockResponse = false) {
+    if (mockResponse) {
+      return {
+        data: "mock api response",
+      };
+    }
     const response = await axios({
       headers: {
         "Content-Type": "application/json",
