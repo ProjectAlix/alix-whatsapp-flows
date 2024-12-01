@@ -63,6 +63,7 @@ class BaseMessageHandler {
     trackedFlowId,
     flowStep,
     flowSection,
+    restarted,
   }) {
     const organizationMessagingServiceSid =
       await this.databaseService.getMessagingServiceSid(
@@ -78,6 +79,7 @@ class BaseMessageHandler {
         clientSideTriggered: this.clientSideTriggered,
         isReminder: this.isReminder,
       },
+      restarted,
       flowName,
       flowStep,
       flowSection,

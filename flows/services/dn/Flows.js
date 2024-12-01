@@ -629,6 +629,17 @@ class EnhamComboFlow extends BaseFlow {
               follow_up_question: "Would you like to ask anything else?",
             },
           });
+        } else if (flowStep === 3) {
+          const endMessage = createTextMessage({
+            waId: this.WaId,
+            textContent: "Thanks for messaging Enham! 👋",
+            messagingServiceSid: this.messagingServiceSid,
+          });
+          await this.saveAndSendTextMessage(
+            endMessage,
+            EnhamComboFlow.FLOW_NAME
+          );
+          flowCompletionStatus = true;
         }
       }
       if (serviceSelection === EnhamComboFlow.SERVICE_OPTIONS[1]) {

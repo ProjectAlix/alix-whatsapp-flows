@@ -172,7 +172,7 @@ class InboundMessageHandler extends BaseMessageHandler {
     const updatedMessageToSave = {
       ...messageToSave,
       Flow: flowName,
-      trackedFlowId: trackedFlowId,
+      trackedFlowId,
     }; //add the flow name and ID to the message that will be saved
     const messageData = await this.createMessageData({
       userInfo,
@@ -180,6 +180,7 @@ class InboundMessageHandler extends BaseMessageHandler {
       trackedFlowId,
       flowStep: 1,
       flowSection: 1,
+      restarted: false,
     });
     await this.flowManagerService.createNewFlow({ messageData, extraData }); //new flow created in firestore, will be retrieved by `handleExistingFlow` on the next message from the user
     //flow saved to mongoDB
@@ -354,13 +355,14 @@ class InboundMessageHandler extends BaseMessageHandler {
       this.body.Body,
       this.buttonPayload
     );
-    const { flowName, flowStep, id: flowId } = currentFlow;
+    const { flowName, flowStep, id: flowId, restarted } = currentFlow;
 
     const messageData = await this.createMessageData({
       userInfo,
       flowName,
       trackedFlowId: flowId,
       flowStep,
+      restarted,
       flowSection: 1,
     });
     await this.databaseService.updateFlowStatus(flowId, "in_progress");
