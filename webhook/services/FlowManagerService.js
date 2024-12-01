@@ -88,9 +88,11 @@ class FlowManagerService {
    *         otherwise returns `false`.
    */
 
-  static incrementConditions(data, buttonPayload) {
+  static getSectionUpdate(data, buttonPayload) {
+    const NEXT_SECTION = 1;
+    const PREV_SECTION = -1;
     if (data.flowName === "survey") {
-      return (
+      if (
         buttonPayload.split("-")[1] ===
           FlowManagerService.NEXT_SECTION_MESSAGE ||
         (data.flowSection == 2 && data.flowStep == 5) ||
@@ -98,12 +100,23 @@ class FlowManagerService {
         (data.flowSection == 4 && data.flowStep == 3) ||
         (data.flowSection == 5 && data.flowStep == 4) ||
         (data.flowSection == 6 && data.flowStep == 7)
-      );
+      ) {
+        return NEXT_SECTION;
+      }
     } else if (data.flowName === "enham-quiz-shelter-moneyhelper") {
-      return data.flowSection == 1 && data.flowStep === 2;
+      if (buttonPayload === FlowManagerService.ENHAM_START_OVER_MESSAGE) {
+        return PREV_SECTION;
+      }
+      if (data.flowSection == 1 && data.flowStep === 2) {
+        return NEXT_SECTION;
+      }
     } else if (data.flowName === "fm-social-survey") {
-      return data.flowStep === 3 || data.flowStep === 4 || data.flowStep === 5;
+      if (data.flowStep === 3 || data.flowStep === 4 || data.flowStep === 5) {
+        return NEXT_SECTION;
+      }
     }
+
+    return null;
   }
 
   constructor(db) {
@@ -385,18 +398,17 @@ class FlowManagerService {
       if (!currentFlowSnapshot.empty) {
         const firstDoc = currentFlowSnapshot.docs[0];
         const data = firstDoc.data();
-        const incrementSection = FlowManagerService.incrementConditions(
+        const sectionChange = FlowManagerService.getSectionUpdate(
           data,
           buttonPayload
         );
-        if (!incrementSection) {
+        if (sectionChange === null) {
           return data;
         }
         const updateId = firstDoc.id;
-        const currentSection = data.flowSection;
         const updatePayload = {
           "flowStep": 1,
-          "flowSection": currentSection + 1,
+          "flowSection": data.flowSection + sectionChange,
           ...additionalUpdates,
         };
         await this.db.collection("flows").doc(updateId).update(updatePayload);
@@ -437,7 +449,7 @@ class FlowManagerService {
       const flowData = firstDoc.data();
       const flowDocRef = this.db.collection("flows").doc(firstDoc.id);
 
-      if (!FlowManagerService.incrementConditions(flowData, buttonPayload)) {
+      if (!FlowManagerService.getSectionUpdate(flowData, buttonPayload)) {
         return flowData; // No increment conditions met, return the current flow data.
       }
 

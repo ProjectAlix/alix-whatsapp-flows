@@ -610,7 +610,8 @@ class EnhamComboFlow extends BaseFlow {
           };
           const response = await llmService.make_llm_request(
             aiApiRequest,
-            "enham-qa"
+            "enham-qa",
+            true
           );
           const llmAnswer = response.data;
           const answerMessage = createTextMessage({
