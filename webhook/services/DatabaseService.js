@@ -68,7 +68,7 @@ class DatabaseService {
    * @param {string} env - The environment ("production" or otherwise) to adjust the response.
    * @returns {Promise<Object>} An object containing the flow document and list of contacts.
    */
-  async getUnresponsiveContacts(flowName, reminderTime, organizationId, env) {
+  async getUnresponsiveContacts(flowName, reminderTime, organizationId) {
     const flow = await this.availableFlowsCollection.findOne({
       "flowName": flowName,
     });
@@ -124,7 +124,7 @@ class DatabaseService {
     const testUser = { WaId: "38269372208", ProfileName: "Daria" };
     return {
       flow: flow,
-      contactList: env === "production" ? [...WaIds, testUser] : [testUser],
+      contactList: [...WaIds, testUser],
     };
   }
   /**

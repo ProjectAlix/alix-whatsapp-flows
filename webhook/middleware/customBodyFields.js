@@ -5,14 +5,12 @@ const buildFlowTriggerRequest = async (req, res, next) => {
   const reminderTime = new Date(now.getTime() - 24 * 60 * 60 * 1000);
   const flowName = req.body.flowName;
   const { organizationId } = req.query;
-  const env = process.env.NODE_ENV;
-  console.log("env", env);
   const { flow, contactList } = await dbService.getUnresponsiveContacts(
     flowName,
     reminderTime,
-    organizationId,
-    env
+    organizationId
   );
+  console.log("flow", flow, "contactList to be sent a reminder", contactList);
   req.body.flow = flow;
   req.body.contactList = contactList;
   next();

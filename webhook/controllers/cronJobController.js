@@ -10,6 +10,11 @@ const sendSurveyReminder = async (req, res, next) => {
     clientSideTriggered: false,
     isReminder: true,
   });
+  if (process.env.NODE_ENV !== "production") {
+    return res
+      .status(200)
+      .json({ message: "Messages would be sent successfully" });
+  }
   await messageHandler.handle();
 };
 
