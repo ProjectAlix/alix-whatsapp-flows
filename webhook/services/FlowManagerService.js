@@ -202,19 +202,22 @@ class FlowManagerService {
         const firstDoc = currentFlowSnapshot.docs[0];
         const data = firstDoc.data();
         const updateId = firstDoc.id;
-        //TO-DO no just no
+        //TO-DO no just no, move to an array of static properties which will be messages for repeating or restarting
         const updatedFlowStep =
           FlowManagerService.REPEAT_ENHAM_QA_MESSAGE !== buttonPayload
             ? data.flowStep + 1
             : data.flowStep - 1;
+        const hasBeenRestarted =
+          FlowManagerService.ENHAM_START_OVER_MESSAGE == buttonPayload;
         data.id = updateId;
         if (shouldUpdate) {
-          await this.db
-            .collection("flows")
-            .doc(updateId)
-            .update({ "flowStep": updatedFlowStep });
+          await this.db.collection("flows").doc(updateId).update({
+            "flowStep": updatedFlowStep,
+            "restarted": hasBeenRestarted,
+          });
           //add the id to the doc so that we can delete it by id later
           data.flowStep = updatedFlowStep;
+          data.restarted = hasBeenRestarted;
         }
         return data;
       }

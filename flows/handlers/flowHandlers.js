@@ -42,6 +42,7 @@ async function runEnhamComboFlow({
   flowConstructorParams,
   flowStep,
   flowSection,
+  restarted,
   serviceSelection,
 }) {
   const {
@@ -62,6 +63,7 @@ async function runEnhamComboFlow({
   const flowCompletionStatus = await enhamComboFlow.handleFlowStep(
     flowStep,
     flowSection,
+    restarted,
     serviceSelection,
     llmService
   );

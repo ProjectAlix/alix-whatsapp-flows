@@ -583,12 +583,20 @@ class EnhamComboFlow extends BaseFlow {
       organizationMessagingServiceSid,
     });
   }
-  async handleFlowStep(flowStep, flowSection, serviceSelection, llmService) {
+  async handleFlowStep(
+    flowStep,
+    flowSection,
+    restarted,
+    serviceSelection,
+    llmService
+  ) {
     let flowCompletionStatus = false;
     if (flowSection === 1) {
       await this.saveAndSendTemplateMessage({
         templateVariables: {
-          greeting: "Hi there, thanks for messaging Enham :) ",
+          greeting: restarted
+            ? "Hi again 👋"
+            : "Hi there, thanks for messaging Enham :) ",
         },
         templateKey: "enham_start",
       });
@@ -610,8 +618,7 @@ class EnhamComboFlow extends BaseFlow {
           };
           const response = await llmService.make_llm_request(
             aiApiRequest,
-            "enham-qa",
-            true
+            "enham-qa"
           );
           const llmAnswer = response.data;
           const answerMessage = createTextMessage({
