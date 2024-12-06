@@ -72,6 +72,7 @@ class DatabaseService {
     const flow = await this.availableFlowsCollection.findOne({
       "flowName": flowName,
     });
+    const contactReminderField = `${flowName}_reminderSent`;
     const unansweredSurveys = await this.sentFlowsCollection
       .aggregate([
         {
@@ -99,7 +100,7 @@ class DatabaseService {
         },
         {
           $match: {
-            "contactInfo.reminderSent": { $exists: false },
+            [`contactInfo.${contactReminderField}`]: { $exists: false },
           },
         },
       ])
@@ -113,14 +114,16 @@ class DatabaseService {
       (survey) => survey.contactInfo._id
     );
     console.log(contactIds);
-    await this.sentFlowsCollection.updateMany(
-      { ContactId: { $in: contactIds }, "flowName": flowName },
-      { $set: { "reminderSent": true } }
-    );
-    await this.contactCollection.updateMany(
-      { _id: { $in: contactIds } },
-      { $set: { "reminderSent": true } }
-    );
+    if (process.env.NODE_ENV === "production") {
+      await this.sentFlowsCollection.updateMany(
+        { ContactId: { $in: contactIds }, "flowName": flowName },
+        { $set: { "reminderSent": true } }
+      );
+      await this.contactCollection.updateMany(
+        { _id: { $in: contactIds } },
+        { $set: { [`contactInfo.${contactReminderField}`]: true } }
+      );
+    }
     const testUser = { WaId: "38269372208", ProfileName: "Daria" };
     return {
       flow: flow,
