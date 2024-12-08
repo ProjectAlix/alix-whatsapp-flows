@@ -83,20 +83,14 @@ class InboundMessageHandler extends BaseMessageHandler {
         return this.res.status(204).send();
       }
       //check if the text of the first message is a preconfigured "trigger" message for a flow to start
-      const flowTriggers = {
-        "hi": this.startSignpostingFlow,
-        "edit details": this.startEditDetailsFlow,
-        "survey": this.startFatMacysSurveyFlow,
-        "enham": this.startEnhamComboFlow,
-        "social survey": this.startFMSocialSurveyFlow,
-        "test": this.onboardUser,
-      };
+
       const trigger = this.body.Body.toLowerCase().trim();
-      if (flowTriggers[trigger]) {
-        await flowTriggers[trigger].call(this, userInfo, messageToSave);
-      } else if (this.isSampleTrigger()) {
-        const sampleVersion = this.body.Body.split("-")[1];
-        await this.startSampleFlow(userInfo, messageToSave, sampleVersion);
+      const flowTriggerFunction = organization.triggers[trigger];
+      if (
+        flowTriggerFunction &&
+        typeof this[flowTriggerFunction] === "function"
+      ) {
+        await this[flowTriggerFunction].call(this, userInfo, messageToSave);
       } else {
         //if not a "trigger" message, calls handleExistingFlow
         /**
@@ -240,8 +234,8 @@ class InboundMessageHandler extends BaseMessageHandler {
    *
    * @returns {Promise<void>} - Resolves when the flow has been started.
    */
-  async startSampleFlow(userInfo, messageToSave, sampleVersion) {
-    await this.startFlow({
+  async startSampleFlow(userInfo, messageToSave) {
+    const sampleVersion = await this.startFlow({
       userInfo,
       messageToSave,
       flowName: `sample-${sampleVersion}`,
