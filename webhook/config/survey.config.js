@@ -195,8 +195,62 @@ const fmSocialSurveyDict = {
   "end-of-year-social&&graduation-event": "Both",
   "!end-of-year-social&&!graduation-event": "None",
 };
+
+const enhamPayrollQuizConfig = {
+  2: {
+    2: {
+      questionContent: "What is your name?",
+
+      questionNumber: "1",
+    },
+    3: {
+      questionContent:
+        "If you are completing the training on behalf of your client, please state your name here. If not applicable respond with 'n/a'",
+      questionNumber: "2",
+    },
+    4: {
+      questionContent: "What is your email address?",
+      questionNumber: "3",
+    },
+    5: {
+      questionContent:
+        "Do you understand that you are receiving a Direct Payment to pay for your Care/Support?\n\nYou can find more information on direct payments here\n\nhttps://www.enhamtrust.org.uk/Pages/Category/direct-payments",
+      questionNumber: "4",
+    },
+    6: {
+      questionContent:
+        "Do you understand that you are receiving a Direct Payment to Choose Your Own Provider?",
+      questionNumber: "5",
+    },
+    7: {
+      questionContent:
+        "Do you know that SCC are not liable for the service providers you choose?",
+      questionNumber: "6",
+    },
+    8: {
+      questionContent:
+        "If/When you choose to become an Employer, do you understand you may have to pay HMRC and purchase Employers Liability Insurance",
+      questionNumber: "7",
+    },
+    9: {
+      questionContent:
+        "Do you understand you will be contacted by the Finance and Benefits Assessment Team?",
+      questionNumber: "8",
+    },
+    10: {
+      questionContent:
+        "Do you know you need a separate bank account for Direct Payments unless you have an Enham Holding Account?",
+      questionNumber: "9",
+    },
+    11: {
+      questionContent: "You have read Direct Payment policy and guidance",
+      questionNumber: "10",
+    },
+  },
+};
 module.exports = {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
   fmSocialSurveyDict,
+  enhamPayrollQuizConfig,
 };

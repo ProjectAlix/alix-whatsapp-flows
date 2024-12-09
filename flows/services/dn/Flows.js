@@ -9,6 +9,7 @@ const { findTemplateSid } = require("../../helpers/twilio_account.helpers");
 const {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
+  enhamPayrollQuizConfig,
 } = require("../../config/survey.config");
 const { BaseFlow, SurveyBaseFlow } = require("../BaseFlow");
 
@@ -674,6 +675,25 @@ class EnhamComboFlow extends BaseFlow {
             EnhamComboFlow.FLOW_NAME //TO-DO check if can remove this
           );
           await this.saveAndSendTemplateMessage({ templateKey: "enhamvideo" });
+        } else {
+          const { responseContent, responseType, templateKey } =
+            enhamPayrollQuizConfig[flowSection][flowStep];
+          if (responseType === "text") {
+            const message = createTextMessage({
+              waId: this.WaId,
+              textContent: responseContent,
+              messagingServiceSid: this.messagingServiceSid,
+            });
+            await this.saveAndSendTextMessage(
+              message,
+              EnhamComboFlow.FLOW_NAME
+            );
+          } else if (responseType === "template") {
+            await this.saveAndSendTemplateMessage({
+              templateKey,
+              templateVariables: responseContent,
+            });
+          }
         }
       }
     }

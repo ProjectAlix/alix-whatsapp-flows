@@ -7,6 +7,7 @@ const { BaseMessageHandler } = require("./BaseMessageHandler");
 const {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
+  enhamPayrollQuizConfig,
 } = require("../config/survey.config");
 
 /**
@@ -83,7 +84,7 @@ class InboundMessageHandler extends BaseMessageHandler {
         return this.res.status(204).send();
       }
       //check if the text of the first message is a preconfigured "trigger" message for a flow to start
-
+      //TO DO configure db before deploying
       const trigger = this.body.Body.toLowerCase().trim();
       const flowTriggerFunction = organization.triggers[trigger];
       if (
@@ -409,6 +410,17 @@ class InboundMessageHandler extends BaseMessageHandler {
         flowSection,
         flowStep
       );
+      if (messageData?.serviceSelection === "training_and_quizzes") {
+        console.log("current section", flowSection, "currentStep", flowStep);
+        const { questionContent, questionNumber } =
+          enhamPayrollQuizConfig?.[flowSection]?.[flowStep] || {};
+        if (questionContent && questionNumber) {
+          await this.databaseService.updateFlowSurvey(flowId, {
+            questionContent,
+            questionNumber,
+          });
+        }
+      }
       messageData.flowSection = flowSection;
       messageData.flowStep = flowStep;
     } else if (flowName === "fm-social-survey") {
