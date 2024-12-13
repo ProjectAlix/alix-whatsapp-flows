@@ -437,9 +437,208 @@ const enhamPayrollQuizConfig = {
       templateKey: "enham_payroll_quiz_questions",
       question: "10",
     },
+    13: {
+      responseContent: {
+        templateVariables:
+          "You fully understand your responsibilities as a Direct Payment recipient",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "11",
+    },
+    14: {
+      responseContent: {
+        templateVariables:
+          "You understand Client contribution and personal top up",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "12",
+    },
+    15: {
+      responseContent: {
+        templateVariables:
+          "You know to contact the Local Authority if circumstances change",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "13",
+    },
+    16: {
+      responseContent: {
+        templateVariables: "You know what records you have to keep for audits",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "14",
+    },
+    17: {
+      responseContent: {
+        templateVariables:
+          "The bank account you will use is just for Direct Payments",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "15",
+    },
+    18: {
+      responseContent: {
+        templateVariables:
+          "You understand that if you do not complete the paperwork you will not receive your Direct Payment funding",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "16",
+    },
+    19: {
+      responseType: "text",
+      responseContent:
+        "Thank you for watching the videos and answering the questions. Now it is time for the final set of questions.",
+      templateKey: null,
+    },
+    20: {
+      responseType: "text",
+      responseContent: "Client Name",
+      templateKey: null,
+      question: "17",
+    },
+    21: {
+      responseType: "text",
+      responseContent: "Representative Name",
+      templateKey: null,
+      question: "18",
+    },
+    22: {
+      responseType: "text",
+      responseContent: "Email Address of Attendee",
+      templateKey: null,
+      question: "19",
+    },
+    23: {
+      responseContent: {
+        templateVariables:
+          "You understand you are receiving a Direct Payment to pay for your Care/Support",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "20",
+    },
+    24: {
+      responseContent: {
+        templateVariables:
+          "You understand that you are receiving a Direct Payment to Choose Your Own Provider",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "21",
+    },
+    25: {
+      responseContent: {
+        templateVariables:
+          "You know that SCC are not liable for the service providers you choose",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "22",
+    },
+    26: {
+      responseContent: {
+        templateVariables:
+          "If/When you choose to become an Employer, you may have to pay HMRC and purchase Employers Liability Insurance",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "23",
+    },
+    27: {
+      responseContent: {
+        templateVariables:
+          "You know you will be contacted by the Finance and Benefits Assessment Team",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "24",
+    },
+    28: {
+      responseContent: {
+        templateVariables:
+          "You know you need a separate bank account for Direct Payments unless you have an Enham Holding Account",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "25",
+    },
+    29: {
+      responseContent: {
+        templateVariables: "You have read Direct Payment policy and guidance",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "26",
+    },
+    30: {
+      responseContent: {
+        templateVariables:
+          "You fully understand your responsibilities as a DP recipient",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "27",
+    },
+    31: {
+      responseContent: {
+        templateVariables:
+          "You understand Client contribution and personal top up",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "28",
+    },
+    32: {
+      responseContent: {
+        templateVariables:
+          "You know to contact the Local Authority if circumstances change",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "29",
+    },
+    33: {
+      responseContent: {
+        templateVariables: "You know what records you have to keep for audits",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "30",
+    },
+    34: {
+      responseContent: {
+        templateVariables:
+          "The bank account you will use is just for the direct payment",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "31",
+    },
+    35: {
+      responseContent: {
+        templateVariables:
+          "You understand that if you do not complete the paperwork you will not receive your Direct Payment funding",
+      },
+      responseType: "template",
+      templateKey: "enham_payroll_quiz_questions",
+      question: "32",
+    },
+    36: {
+      responseContent: {
+        templateVariables: "You may now ask questions about Direct Payments",
+      },
+      responseType: "template",
+      templateKey: "enham_quiz_end",
+    },
   },
 };
-
+//You may now ask questions about Direct Payments
 module.exports = {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,

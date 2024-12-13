@@ -1,4 +1,4 @@
-const { runStepBasedFlow2 } = require("../services/samples/runStepBasedFlow2");
+const { runStepBasedFlow2 } = require("../flows/samples/runStepBasedFlow2");
 const {
   runEditDetailsFlow,
   runEnhamComboFlow,

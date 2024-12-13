@@ -411,6 +411,11 @@ class InboundMessageHandler extends BaseMessageHandler {
         flowStep
       );
       if (messageData?.serviceSelection === "training_and_quizzes") {
+        await this.databaseService.updateFlowWithResponse(
+          flowId,
+          this.body.Body,
+          this.body.MessageSid
+        );
         console.log("current section", flowSection, "currentStep", flowStep);
         const { questionContent, questionNumber } =
           enhamPayrollQuizConfig?.[flowSection]?.[flowStep] || {};
@@ -464,11 +469,16 @@ class InboundMessageHandler extends BaseMessageHandler {
    */
 
   async updateUserSignpostingSelection(flowId, currentFlowStep) {
-    const updatedDoc = await this.flowManagerService.updateUserSelection({
+    console.log({
       flowId,
       flowStep: currentFlowStep,
       selectionValue: this.body.Body,
       seeMoreOptionMessages: InboundMessageHandler.SEE_MORE_OPTIONS_MESSAGES,
+    });
+    const updatedDoc = await this.flowManagerService.updateUserSelection({
+      flowId,
+      flowStep: currentFlowStep,
+      selectionValue: this.body.Body,
     });
     return updatedDoc?.userSelection;
   }

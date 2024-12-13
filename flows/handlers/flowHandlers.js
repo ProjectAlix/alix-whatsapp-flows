@@ -1,12 +1,11 @@
+const { EnhamComboFlow } = require("../flows/enhamFlows");
 const {
   OnboardingFlow,
   SignpostingFlow,
   EditDetailsFlow,
-  FatMacysSurveyFlow,
-  EnhamComboFlow,
-  FMSocialSurveyFlow,
-} = require("../services/dn/Flows");
-const { StepBasedFlow } = require("../services/samples/StepBasedFlow");
+} = require("../flows/alixFlows");
+const { FMSocialSurveyFlow, FatMacysSurveyFlow } = require("../flows/fmFlows");
+const { StepBasedFlow } = require("../flows/samples/StepBasedFlow");
 const { SupportOptionService } = require("../services/dn/SupportOptionService");
 const { api_base } = require("../config/llm_api.config");
 const { LLMService } = require("../services/dn/LLMService");

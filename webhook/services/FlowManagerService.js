@@ -52,6 +52,7 @@ class FlowManagerService {
    */
 
   static ENHAM_START_OVER_MESSAGE = "startover-enham_qa";
+  static ENHAM_QUIZ_END_MESSAGE = "startover-ask_questions-";
   /**
    * @static
    * @type {Object}
@@ -91,6 +92,7 @@ class FlowManagerService {
   static getSectionUpdate(data, buttonPayload) {
     const NEXT_SECTION = 1;
     const PREV_SECTION = -1;
+    const RESET_STEP = 0;
     if (data.flowName === "survey") {
       if (
         buttonPayload.split("-")[1] ===
@@ -107,7 +109,10 @@ class FlowManagerService {
       if (buttonPayload === FlowManagerService.ENHAM_START_OVER_MESSAGE) {
         return PREV_SECTION;
       }
-      if (data.flowSection == 1 && data.flowStep === 2) {
+      if (buttonPayload === FlowManagerService.ENHAM_QUIZ_END_MESSAGE) {
+        return RESET_STEP;
+      }
+      if (data.flowSection === 1 && data.flowStep === 2) {
         return NEXT_SECTION;
       }
     } else if (data.flowName === "fm-social-survey") {
@@ -274,23 +279,21 @@ class FlowManagerService {
    * @returns {Promise<Object|null>} Updated document data or null if not found.
    * @see {@link ../handlers/MessageHandlers.js~InboundMessageHandler#updateUserSignpostingSelection}
    */
-  async updateUserSelection({
-    flowId,
-    flowStep,
-    selectionValue,
-    seeMoreOptionMessages,
-  }) {
+  async updateUserSelection({ flowId, flowStep, selectionValue }) {
     const selectionNames = {
       2: "category",
       3: "location",
     };
     const flowRef = this.db.collection("flows").doc(flowId);
-    const runNextStep = !seeMoreOptionMessages.includes(selectionValue);
-    if (selectionValue === seeMoreOptionMessages[0]) {
+    const runNextStep =
+      !FlowManagerService.SEE_MORE_OPTIONS_MESSAGES.includes(selectionValue);
+    if (selectionValue === FlowManagerService.SEE_MORE_OPTIONS_MESSAGES[0]) {
       await flowRef.update({
         "userSelection.page": FieldValue.increment(1),
       });
-    } else if (selectionValue === seeMoreOptionMessages[1]) {
+    } else if (
+      selectionValue === FlowManagerService.SEE_MORE_OPTIONS_MESSAGES[1]
+    ) {
       await flowRef.update({
         "userSelection.endFlow": true,
       });
@@ -483,13 +486,14 @@ class FlowManagerService {
     }
   }
 
-  async createEnhamServiceSelection({ flowId, buttonPayload }) {
+  async createEnhamServiceSelection({ flowId, buttonPayload = "" }) {
     const flowRef = this.db.collection("flows").doc(flowId);
-    if (!FlowManagerService.ENHAM_SERVICE_OPTIONS.includes(buttonPayload)) {
+    const serviceSelection = buttonPayload.split("-")[1];
+    if (!FlowManagerService.ENHAM_SERVICE_OPTIONS.includes(serviceSelection)) {
       const currentData = await flowRef.get();
       return currentData.data();
     }
-    await flowRef.update({ serviceSelection: buttonPayload });
+    await flowRef.update({ serviceSelection });
     const updatedDoc = await flowRef.get();
 
     return updatedDoc.data();

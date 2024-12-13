@@ -246,6 +246,108 @@ const enhamPayrollQuizConfig = {
       questionContent: "You have read Direct Payment policy and guidance",
       questionNumber: "10",
     },
+    13: {
+      questionContent:
+        "You fully understand your responsibilities as a Direct Payment recipient",
+      questionNumber: "11",
+    },
+    14: {
+      questionContent: "You undersatnd Client contribution and personal top up",
+      questionNumber: "12",
+    },
+    15: {
+      questionContent:
+        "You know to contact the Local Authority if circumstances change",
+      questionNumber: "13",
+    },
+    16: {
+      questionContent: "You know what records you have to keep for audits",
+      questionNumber: "14",
+    },
+    17: {
+      questionContent:
+        "The bank account you will use is just for Direct Payments",
+      questionNumber: "15",
+    },
+    18: {
+      questionContent:
+        "You understand that if you do not complete the paperwork you will not receive your Direct Payment funding",
+      questionNumber: "16",
+    },
+    20: {
+      questionContent: "Client Name",
+      questionNumber: "17",
+    },
+    21: {
+      questionContent: "Representative Name",
+      questionNumber: "18",
+    },
+    22: {
+      questionContent: "Email Address of Attendee",
+      questionNumber: "19",
+    },
+    23: {
+      questionContent:
+        "You understand you are receiving a Direct Payment to pay for your Care/Support",
+      questionNumber: "20",
+    },
+    24: {
+      questionContent:
+        "You understand that you are receiving a Direct Payment to Choose Your Own Provider",
+      questionNumber: "21",
+    },
+    25: {
+      questionContent:
+        "You know that SCC are not liable for the service providers you choose",
+      questionNumber: "22",
+    },
+    26: {
+      questionContent:
+        "If/When you choose to become an Employer, you may have to pay HMRC and purchase Employers Liability Insurance",
+      questionNumber: "23",
+    },
+    27: {
+      questionContent:
+        "You know you will be contacted by the Finance and Benefits Assessment Team",
+      questionNumber: "24",
+    },
+    28: {
+      questionContent:
+        "You know you need a separate bank account for Direct Payments unless you have an Enham Holding Account",
+      questionNumber: "25",
+    },
+    29: {
+      questionContent: "You have read Direct Payment policy and guidance",
+      questionNumber: "26",
+    },
+    30: {
+      questionContent:
+        "You fully understand your responsibilities as a DP recipient",
+      questionNumber: "27",
+    },
+    31: {
+      questionContent: "You understand Client contribution and personal top up",
+      questionNumber: "28",
+    },
+    32: {
+      questionContent:
+        "You know to contact the Local Authority if circumstances change",
+      questionNumber: "29",
+    },
+    33: {
+      questionContent: "You know what records you have to keep for audits",
+      questionNumber: "30",
+    },
+    34: {
+      questionContent:
+        "The bank account you will use is just for the direct payment",
+      questionNumber: "31",
+    },
+    35: {
+      questionContent:
+        "You understand that if you do not complete the paperwork you will not receive your Direct Payment funding",
+      questionNumber: "32",
+    },
   },
 };
 module.exports = {
