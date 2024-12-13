@@ -7,6 +7,7 @@ const {
   runStepBasedFlow,
   runSurveyFlow,
   runFMSocialSurveyFlow,
+  runEnhamDemoFlow,
 } = require("../handlers/flowHandlers");
 const { ContactModel } = require("../models/ContactModel");
 
@@ -118,6 +119,12 @@ async function flowController(req, res, next) {
         flowSection,
         restarted,
         serviceSelection,
+      });
+    } else if (flow === "enham-ai-video-demo") {
+      flowCompletionStatus = await runEnhamDemoFlow({
+        flowConstructorParams,
+        flowStep,
+        flowSection,
       });
     }
     res.status(200).send({ flowCompletionStatus });

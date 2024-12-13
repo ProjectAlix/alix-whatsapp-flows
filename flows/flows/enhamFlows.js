@@ -1,6 +1,10 @@
 const { createTextMessage } = require("../helpers/messages.helpers");
 const { BaseFlow } = require("./BaseFlow");
-const { enhamPayrollQuizConfig } = require("../config/flowResponses.config");
+const {
+  enhamPayrollQuizConfig,
+  enham,
+  enhamDemoConfig,
+} = require("../config/flowResponses.config");
 class EnhamComboFlow extends BaseFlow {
   static FLOW_NAME = "enham-quiz-shelter-moneyhelper";
   static SERVICE_OPTIONS = [
@@ -152,6 +156,91 @@ class EnhamComboFlow extends BaseFlow {
   }
 }
 
+class EnhamVideoDemoFlow extends BaseFlow {
+  static FLOW_NAME = "enham-ai-video-demo";
+  constructor({
+    userInfo,
+    userMessage,
+    contactModel,
+    organizationPhoneNumber,
+    organizationMessagingServiceSid,
+  }) {
+    super({
+      userInfo,
+      userMessage,
+      contactModel,
+      organizationPhoneNumber,
+      organizationMessagingServiceSid,
+    });
+  }
+  async handleFlowStep(flowStep, flowSection) {
+    let flowCompletionStatus = false;
+    if (flowStep === 1) {
+      await this.saveAndSendTemplateMessage({
+        templateKey: "enham_ai_video_demo",
+      });
+    } else if (flowStep === 2) {
+      await this.saveAndSendTemplateMessage({
+        templateKey: "demo_options",
+        templateVariables: {
+          templateVariables:
+            "Thanks - please choose who you want to speak with, from A, B, C or D",
+        },
+      });
+      await this.saveAndSendTemplateMessage({
+        templateKey: "media",
+        templateVariables: {
+          templateVariables: "Avatar options",
+          mediaId: "1qcSoOEpQVFX6d3v1dwKVYGmZfbrBmt60",
+        },
+      });
+    } else {
+      const config = enhamDemoConfig[flowSection]?.[flowStep];
+      if (!config) {
+        // If the config for the given flowSection and flowStep is undefined, return early.
+        return flowCompletionStatus;
+      }
+
+      const {
+        responseContent,
+        responseType,
+        templateKey,
+        buttonTemplateConfig,
+      } = config;
+      if (responseType === "text") {
+        const message = createTextMessage({
+          waId: this.WaId,
+          textContent: responseContent,
+          messagingServiceSid: this.messagingServiceSid,
+        });
+        await this.saveAndSendTextMessage(
+          message,
+          EnhamVideoDemoFlow.FLOW_NAME
+        );
+      } else if (responseType === "template") {
+        await this.saveAndSendTemplateMessage({
+          templateKey,
+          templateVariables: responseContent,
+        });
+      }
+      if (buttonTemplateConfig.sendButtonTemplate) {
+        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+        // Set the timeout before running the function
+        const timeoutDuration = 7000; // Time in milliseconds (e.g., 2000ms = 2 seconds)
+
+        await delay(timeoutDuration);
+        await this.saveAndSendTemplateMessage({
+          templateKey: buttonTemplateConfig.buttonTemplateKey,
+          templateVariables: buttonTemplateConfig.buttonTemplateContent,
+        });
+      }
+    }
+    return flowCompletionStatus;
+  }
+}
+
 module.exports = {
   EnhamComboFlow,
+  EnhamVideoDemoFlow,
 };

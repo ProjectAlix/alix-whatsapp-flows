@@ -10,6 +10,7 @@ class DatabaseService {
    * @type {string[]}
    */
   static BULK_COMPLETION_ENABLED_FLOWNAMES = ["survey"];
+  static TEST_ONLY_FLOWNAMES = ["enham-ai-video-demo"];
   /**
    * Initializes the DatabaseService instance with the provided database client.
    * @param {Db} db - The MongoDB database client instance.
@@ -225,6 +226,9 @@ class DatabaseService {
    */
   async saveMessage(message, organizationPhoneNumber) {
     try {
+      if (DatabaseService.TEST_ONLY_FLOWNAMES.includes(message.Flow)) {
+        return;
+      }
       const contact = await this.getUser(message.WaId, organizationPhoneNumber);
       await this.messagesCollection.insertOne({
         ...message,
@@ -252,7 +256,9 @@ class DatabaseService {
         { MessageSid: messageSid },
         { $set: { Status: status } }
       );
-
+      if (!updatedMessage) {
+        return;
+      }
       await this.updateFlowStatus(updatedMessage.trackedFlowId, status);
 
       console.log(`Message status updated to ${status}`);
@@ -280,6 +286,9 @@ class DatabaseService {
     isReminder,
   }) {
     try {
+      if (DatabaseService.TEST_ONLY_FLOWNAMES.includes(flowName)) {
+        return;
+      }
       const contact = await this.getUser(WaId, organizationPhoneNumber);
       console.log(contact);
       const newFlowDoc = {

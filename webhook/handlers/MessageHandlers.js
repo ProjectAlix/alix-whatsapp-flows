@@ -327,6 +327,14 @@ class InboundMessageHandler extends BaseMessageHandler {
       flowName: "fm-social-survey",
     });
   }
+
+  async startEnhamVideoDemo(userInfo, messageToSave) {
+    await this.startFlow({
+      userInfo,
+      messageToSave,
+      flowName: "enham-ai-video-demo",
+    });
+  }
   /**
    *
    * Handles an existing flow for the user based on their current flow status.

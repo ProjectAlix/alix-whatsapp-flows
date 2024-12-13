@@ -19,6 +19,7 @@ class BaseFlow {
    * @param {string} params.organizationPhoneNumber - Phone number for the organization.
    * @param {string} params.organizationMessagingServiceSid - Messaging Service SID.
    */
+  static TEST_ONLY_FLOWNAMES = ["enham-ai-video-demo"];
   constructor({
     userInfo,
     userMessage = {},
@@ -116,8 +117,11 @@ class BaseFlow {
    * @see {@link sendMessage}
    */
   async saveAndSendTextMessage(message, flowName) {
-    const insertedId = await this.saveResponseMessage({ message, flowName });
     const sid = await sendMessage(message);
+    if (this.constructor.TEST_ONLY_FLOWNAMES.includes(flowName)) {
+      return;
+    }
+    const insertedId = await this.saveResponseMessage({ message, flowName });
     await this.updateResponse(insertedId, sid);
   }
 
@@ -144,12 +148,18 @@ class BaseFlow {
       templateVariables,
       messagingServiceSid: this.messagingServiceSid,
     });
+    const sid = await sendMessage(templateMessage);
+    if (
+      this.constructor.TEST_ONLY_FLOWNAMES.includes(this.constructor.FLOW_NAME)
+    ) {
+      return;
+    }
     const insertedId = await this.saveResponseMessage({
       message: templateMessage,
       flowName: this.constructor.FLOW_NAME,
       templateName,
     });
-    const sid = await sendMessage(templateMessage);
+
     await this.updateResponse(insertedId, sid);
   }
 }

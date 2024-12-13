@@ -638,9 +638,75 @@ const enhamPayrollQuizConfig = {
     },
   },
 };
-//You may now ask questions about Direct Payments
+const enhamDemoConfig = {
+  1: {
+    3: {
+      responseContent: {
+        templateVariables: "Hi Matt, It’s really nice to meet you.",
+        mediaId: "1ikeDaWpc35J1NZ0nFV8xcZD363GiinTY",
+      },
+      responseType: "template",
+      templateKey: "media",
+      buttonTemplateConfig: {
+        sendButtonTemplate: true,
+        buttonTemplateKey: "demo_change_language",
+        buttonTemplateContent: {
+          templateVariables:
+            "Would you like to change language or keep English?",
+        },
+      },
+    },
+    4: {
+      responseContent: {
+        templateVariables:
+          "Please could you press on the camera or the microphone button and say a few words to me about your experience with direct payments so far",
+        mediaId: "1I2h6-FgXH6JLkXXccV5yVOn-z96TVM4j",
+      },
+      responseType: "template",
+      templateKey: "media",
+      buttonTemplateConfig: {
+        sendButtonTemplate: false,
+      },
+    },
+    5: {
+      responseContent: {
+        templateVariables:
+          "Before we get started on the learning, feel free to ask me any questions, which you can do throughout the videos too",
+        mediaId: "1abXE9FSAchfJy3mQCzEWWn_iVHjGzTkT",
+      },
+      buttonTemplateConfig: {
+        sendButtonTemplate: true,
+        buttonTemplateKey: "demo_start_module",
+        buttonTemplateContent: {
+          templateVariables:
+            "Before we get started on the learning, feel free to ask any questions",
+        },
+      },
+      responseType: "template",
+      templateKey: "media",
+    },
+    7: {
+      responseContent: {
+        templateVariables:
+          "“Direct payments cannot be used to pay for services from a partner or close relative living in the same household, unless there are agreed exceptional circumstances",
+        mediaId: "142yilkQ5P83OCkj-9x5Se_mWh2Sj-I9T",
+      },
+      buttonTemplateConfig: {
+        sendButtonTemplate: true,
+        buttonTemplateKey: "demo_start_module",
+        buttonTemplateContent: {
+          templateVariables:
+            "Before we get started on the learning, feel free to ask any questions",
+        },
+      },
+      responseType: "template",
+      templateKey: "media",
+    },
+  },
+};
 module.exports = {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
   enhamPayrollQuizConfig,
+  enhamDemoConfig,
 };
