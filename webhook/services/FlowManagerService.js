@@ -52,7 +52,7 @@ class FlowManagerService {
    */
 
   static ENHAM_START_OVER_MESSAGE = "startover-enham_qa";
-  static ENHAM_QUIZ_END_MESSAGE = "startover-ask_questions-";
+  static ENHAM_QUIZ_END_MESSAGE = "ask_questions-startover";
   /**
    * @static
    * @type {Object}
@@ -488,7 +488,8 @@ class FlowManagerService {
 
   async createEnhamServiceSelection({ flowId, buttonPayload = "" }) {
     const flowRef = this.db.collection("flows").doc(flowId);
-    const serviceSelection = buttonPayload.split("-")[1];
+    const serviceSelection = buttonPayload.split("-")[0];
+    console.log(serviceSelection);
     if (!FlowManagerService.ENHAM_SERVICE_OPTIONS.includes(serviceSelection)) {
       const currentData = await flowRef.get();
       return currentData.data();

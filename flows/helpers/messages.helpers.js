@@ -25,7 +25,9 @@ const createTemplateMessage = ({
   console.log("to save", message);
   return message;
 };
+const delayMessage = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 module.exports = {
   createTextMessage,
   createTemplateMessage,
+  delayMessage,
 };

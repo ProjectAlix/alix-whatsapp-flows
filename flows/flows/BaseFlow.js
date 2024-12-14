@@ -119,6 +119,7 @@ class BaseFlow {
   async saveAndSendTextMessage(message, flowName) {
     const sid = await sendMessage(message);
     if (this.constructor.TEST_ONLY_FLOWNAMES.includes(flowName)) {
+      console.log("message not saved");
       return;
     }
     const insertedId = await this.saveResponseMessage({ message, flowName });
@@ -152,6 +153,7 @@ class BaseFlow {
     if (
       this.constructor.TEST_ONLY_FLOWNAMES.includes(this.constructor.FLOW_NAME)
     ) {
+      console.log("message not saved");
       return;
     }
     const insertedId = await this.saveResponseMessage({

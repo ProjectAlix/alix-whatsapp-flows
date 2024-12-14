@@ -491,10 +491,12 @@ const enhamPayrollQuizConfig = {
       question: "16",
     },
     19: {
-      responseType: "text",
-      responseContent:
-        "Thank you for watching the videos and answering the questions. Now it is time for the final set of questions.",
-      templateKey: null,
+      responseType: "template", //change to template with "ok"
+      responseContent: {
+        templateVariables:
+          "Thank you for watching the videos and answering the questions. Now it is time for the final set of questions.",
+      },
+      templateKey: "default_ok",
     },
     20: {
       responseType: "text",

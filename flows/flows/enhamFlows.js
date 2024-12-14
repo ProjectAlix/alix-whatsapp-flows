@@ -1,8 +1,10 @@
-const { createTextMessage } = require("../helpers/messages.helpers");
+const {
+  createTextMessage,
+  delayMessage,
+} = require("../helpers/messages.helpers");
 const { BaseFlow } = require("./BaseFlow");
 const {
   enhamPayrollQuizConfig,
-  enham,
   enhamDemoConfig,
 } = require("../config/flowResponses.config");
 class EnhamComboFlow extends BaseFlow {
@@ -35,6 +37,11 @@ class EnhamComboFlow extends BaseFlow {
     serviceSelection,
     llmService
   ) {
+    console.log(
+      serviceSelection === EnhamComboFlow.SERVICE_OPTIONS[1],
+      serviceSelection,
+      EnhamComboFlow.SERVICE_OPTIONS
+    );
     let flowCompletionStatus = false;
     if (flowSection === 1) {
       await this.saveAndSendTemplateMessage({
@@ -101,7 +108,7 @@ class EnhamComboFlow extends BaseFlow {
             "Welcome to Enham's Direct Payment Agreement! You will watch two videos and answer some questions for us!",
             `Please watch the first 7 Minutes of this video before moving forward to answer the first set of questions.\n\nhttps://www.youtube.com/watch?v=SrGqTLp4qZw`,
           ];
-
+          console.log("should sent msgs");
           const [welcomeMessage, videoMessage] = messageTexts.map((str) =>
             createTextMessage({
               waId: this.WaId,
@@ -173,6 +180,7 @@ class EnhamVideoDemoFlow extends BaseFlow {
       organizationMessagingServiceSid,
     });
   }
+
   async handleFlowStep(flowStep, flowSection) {
     let flowCompletionStatus = false;
     if (flowStep === 1) {
@@ -181,17 +189,18 @@ class EnhamVideoDemoFlow extends BaseFlow {
       });
     } else if (flowStep === 2) {
       await this.saveAndSendTemplateMessage({
+        templateKey: "media",
+        templateVariables: {
+          templateVariables: "Avatar options",
+          mediaId: "1xZZjde734y2j25fdfq2AvR9K99_RbvLp",
+        },
+      });
+      await delayMessage(7000);
+      await this.saveAndSendTemplateMessage({
         templateKey: "demo_options",
         templateVariables: {
           templateVariables:
             "Thanks - please choose who you want to speak with, from A, B, C or D",
-        },
-      });
-      await this.saveAndSendTemplateMessage({
-        templateKey: "media",
-        templateVariables: {
-          templateVariables: "Avatar options",
-          mediaId: "1qcSoOEpQVFX6d3v1dwKVYGmZfbrBmt60",
         },
       });
     } else {
@@ -224,12 +233,7 @@ class EnhamVideoDemoFlow extends BaseFlow {
         });
       }
       if (buttonTemplateConfig.sendButtonTemplate) {
-        const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
-
-        // Set the timeout before running the function
-        const timeoutDuration = 7000; // Time in milliseconds (e.g., 2000ms = 2 seconds)
-
-        await delay(timeoutDuration);
+        await delayMessage(7000);
         await this.saveAndSendTemplateMessage({
           templateKey: buttonTemplateConfig.buttonTemplateKey,
           templateVariables: buttonTemplateConfig.buttonTemplateContent,
