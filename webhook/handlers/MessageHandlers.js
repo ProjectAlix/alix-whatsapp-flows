@@ -84,7 +84,7 @@ class InboundMessageHandler extends BaseMessageHandler {
         return this.res.status(204).send();
       }
       //check if the text of the first message is a preconfigured "trigger" message for a flow to start
-      //TO DO configure db before deploying
+      //TO DO add test for this part
       const trigger = this.body.Body.toLowerCase().trim();
       const flowTriggerFunction = organization.triggers[trigger];
       if (

@@ -191,7 +191,7 @@ class EnhamVideoDemoFlow extends BaseFlow {
       await this.saveAndSendTemplateMessage({
         templateKey: "media",
         templateVariables: {
-          templateVariables: "Avatar options",
+          templateVariables: "Advisors you can speak with",
           mediaId: "1xZZjde734y2j25fdfq2AvR9K99_RbvLp",
         },
       });
