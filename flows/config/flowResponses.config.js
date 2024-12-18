@@ -706,9 +706,63 @@ const enhamDemoConfig = {
     },
   },
 };
+
+const enhamPARegistrationConfig = {
+  //the update needs to happen on the property that was before what is being asked about now
+  1: {
+    2: {
+      responseContent: {
+        templateVariables:
+          "Great, before we start:\n\nDo you have an in-date Portable DBS? ✅\n\nYou should be able to look up your latest registration on this government website",
+      },
+      responseType: "template",
+      templateKey: "default_yn",
+      profileUpdateConfig: {
+        updateUserProfile: false,
+      },
+    },
+    3: {
+      responseContent: `Thanks! It would be great to check which languages you're able to support:\n\n${
+        "1. English 🇬🇧\n\n" +
+        "2. Welsh 🏴\n\n" +
+        "3. Hindi/Urdu 🇮🇳🇵🇰\n\n" +
+        "4. Polish 🇵🇱\n\n" +
+        "5. Arabic 🇸🇦\n\n"
+      }\n\nPlease enter your response in the following format: 1, 2, 3`,
+      responseType: "text",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "in-date Portable DBS",
+      },
+    },
+    4: {
+      responseType: "template",
+      responseContent: {
+        templateVariables:
+          "Great, thanks for sharing your details. You can edit your details at any point by writing ‘edit details’\n\nAre you happy for us to check-in 👋around your availability on a:",
+      },
+      templateKey: "enham_pa_scheduling",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "Language",
+      },
+    },
+    5: {
+      responseType: "none", // Indicates no message will be sent
+      responseContent: null, // Not required for this step
+      templateKey: null, // Not applicable
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "Availability Preference",
+      },
+    },
+  },
+};
 module.exports = {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
   enhamPayrollQuizConfig,
   enhamDemoConfig,
+  enhamPARegistrationConfig,
 };

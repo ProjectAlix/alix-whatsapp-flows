@@ -2,3 +2,4 @@ node_modules/
 app.yaml
 .gcloudignore
 .env
+me.json

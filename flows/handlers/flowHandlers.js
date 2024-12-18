@@ -1,4 +1,8 @@
-const { EnhamComboFlow, EnhamVideoDemoFlow } = require("../flows/enhamFlows");
+const {
+  EnhamComboFlow,
+  EnhamVideoDemoFlow,
+  EnhamPARegisterFlow,
+} = require("../flows/enhamFlows");
 const {
   OnboardingFlow,
   SignpostingFlow,
@@ -38,6 +42,33 @@ async function runFMSocialSurveyFlow({
   return flowCompletionStatus;
 }
 
+async function runEnhamPARegisterFlow({
+  flowConstructorParams,
+  flowStep,
+  cancelSurvey,
+  flowSection,
+}) {
+  const {
+    userInfo,
+    userMessage,
+    contactModel,
+    organizationPhoneNumber,
+    organizationMessagingServiceSid,
+  } = flowConstructorParams;
+  const enhamPaRegisterFlow = new EnhamPARegisterFlow({
+    userInfo,
+    userMessage,
+    contactModel,
+    organizationPhoneNumber,
+    organizationMessagingServiceSid,
+  });
+  const flowCompletionStatus = await enhamPaRegisterFlow.handleFlowStep(
+    flowStep,
+    flowSection,
+    cancelSurvey
+  );
+  return flowCompletionStatus;
+}
 async function runEnhamDemoFlow({
   flowConstructorParams,
   flowStep,
@@ -278,4 +309,5 @@ module.exports = {
   runSurveyFlow,
   runFMSocialSurveyFlow,
   runEnhamDemoFlow,
+  runEnhamPARegisterFlow,
 };

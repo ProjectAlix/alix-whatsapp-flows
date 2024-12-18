@@ -2,10 +2,11 @@ const {
   createTextMessage,
   delayMessage,
 } = require("../helpers/messages.helpers");
-const { BaseFlow } = require("./BaseFlow");
+const { BaseFlow, SurveyBaseFlow } = require("./BaseFlow");
 const {
   enhamPayrollQuizConfig,
   enhamDemoConfig,
+  enhamPARegistrationConfig,
 } = require("../config/flowResponses.config");
 class EnhamComboFlow extends BaseFlow {
   static FLOW_NAME = "enham-quiz-shelter-moneyhelper";
@@ -244,7 +245,68 @@ class EnhamVideoDemoFlow extends BaseFlow {
   }
 }
 
+class EnhamPARegisterFlow extends SurveyBaseFlow {
+  static FLOW_NAME = "enham-pa-register";
+  async handleFlowStep(flowStep, flowSection, cancelSurvey) {
+    let flowCompletionStatus = false;
+    if (cancelSurvey) {
+      const message = this.createCancellationMessage(this.WaId);
+      await this.saveAndSendTextMessage(message, EnhamPARegisterFlow.FLOW_NAME);
+      flowCompletionStatus = true;
+      return flowCompletionStatus;
+    }
+    if (flowStep === 1) {
+      //user started a PA registration flow
+      const updateDoc = {
+        isPA: true,
+        PAregistrationComplete: false,
+        PA_profile: {},
+      };
+      await this.contactModel.updateContact(this.WaId, updateDoc);
+      await this.saveAndSendTemplateMessage({
+        templateKey: "enham_pa_register_intro",
+      });
+    } else {
+      const config = enhamPARegistrationConfig[flowSection]?.[flowStep];
+      if (!config) {
+        return flowCompletionStatus;
+      }
+      const {
+        responseContent,
+        responseType,
+        templateKey,
+        profileUpdateConfig,
+      } = config;
+      if (profileUpdateConfig.updateUserProfile) {
+        const updatePath = `PA_profile.${profileUpdateConfig.updateKey}`;
+        const updateDoc = {
+          [updatePath]: this.messageContent,
+        };
+        await this.contactModel.updateContact(this.WaId, updateDoc);
+      }
+      if (responseType === "text") {
+        const message = createTextMessage({
+          waId: this.WaId,
+          textContent: responseContent,
+          messagingServiceSid: this.messagingServiceSid,
+        });
+        await this.saveAndSendTextMessage(
+          message,
+          EnhamVideoDemoFlow.FLOW_NAME
+        );
+      } else if (responseType === "template") {
+        await this.saveAndSendTemplateMessage({
+          templateKey,
+          templateVariables: responseContent,
+        });
+      }
+    }
+    return flowCompletionStatus;
+  }
+}
+
 module.exports = {
   EnhamComboFlow,
   EnhamVideoDemoFlow,
+  EnhamPARegisterFlow,
 };
