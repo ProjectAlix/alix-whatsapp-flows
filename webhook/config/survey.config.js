@@ -353,29 +353,25 @@ const enhamPayrollQuizConfig = {
 
 const enhamPARegisterConfig = {
   1: {
-    2: {
+    1: {
       questionContent: "username",
-      questionNumber: " 1",
+      questionNumber: "1",
     },
-    3: {
-      questionContent: "dob",
+    2: {
+      questionContent: "alt_phone_number",
       questionNumber: "2",
     },
-    4: {
-      questionContent: "alt_phone_number",
+    3: {
+      questionContent: "email_address",
       questionNumber: "3",
     },
-    5: {
-      questionContent: "email_address",
+    4: {
+      questionContent: "postcode",
       questionNumber: "4",
     },
-    6: {
-      questionContent: "address",
+    5: {
+      questionContent: "max_travel_distance",
       questionNumber: "5",
-    },
-    7: {
-      questionContent: "emergency_contact",
-      questionNumber: "6",
     },
   },
 };

@@ -180,6 +180,24 @@ class InboundMessageHandler extends BaseMessageHandler {
     });
     await this.flowManagerService.createNewFlow({ messageData, extraData }); //new flow created in firestore, will be retrieved by `handleExistingFlow` on the next message from the user
     //flow saved to mongoDB
+    let extraFields = {};
+    if (BaseMessageHandler.INITIAL_QUESTION_DICT[flowName]) {
+      const { questionContent, questionNumber } =
+        BaseMessageHandler.INITIAL_QUESTION_DICT[flowName]?.[
+          messageData.flowSection
+        ]?.[messageData.flowStep] || {}; //this is so ugly HAHAHAHAHAHAHAHA
+      console.log(questionContent, questionNumber);
+      extraFields = {
+        surveyResponses: [
+          {
+            questionContent,
+            questionNumber,
+            CreatedAt: new Date(),
+            originalMessageSid: messageData.MessageSid,
+          },
+        ],
+      };
+    }
     await this.databaseService.saveFlow({
       WaId: userInfo.WaId,
       trackedFlowId,
@@ -187,7 +205,9 @@ class InboundMessageHandler extends BaseMessageHandler {
       clientSideTriggered: this.clientSideTriggered,
       organizationPhoneNumber: this.organizationPhoneNumber,
       isReminder: this.isReminder,
+      extraFields,
     });
+
     //HTTP POST request is made to the Flows API (flows/signposting), containing messageData returned from `createMessageData` in the request body
     console.log("sent to flows", messageData);
     await this.postRequestService.make_request(
@@ -338,6 +358,7 @@ class InboundMessageHandler extends BaseMessageHandler {
   }
 
   async startEnhamPARegisterFlow(userInfo, messageToSave) {
+    console.log("message to save here", messageToSave);
     await this.startFlow({
       userInfo,
       messageToSave,

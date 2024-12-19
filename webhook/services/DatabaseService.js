@@ -284,6 +284,7 @@ class DatabaseService {
     clientSideTriggered,
     organizationPhoneNumber,
     isReminder,
+    extraFields = {},
   }) {
     try {
       if (DatabaseService.TEST_ONLY_FLOWNAMES.includes(flowName)) {
@@ -300,6 +301,7 @@ class DatabaseService {
         clientSideTriggered,
         trackedFlowId,
         isReminder,
+        ...extraFields,
       };
       await this.sentFlowsCollection.insertOne(newFlowDoc);
     } catch (err) {

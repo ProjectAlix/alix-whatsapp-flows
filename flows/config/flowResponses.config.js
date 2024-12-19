@@ -712,15 +712,7 @@ const enhamPARegistrationConfig = {
   1: {
     sectionName: "personal_info",
     2: {
-      responseContent: "👋 Please enter your name",
-      responseType: "text",
-      templateKey: null,
-      profileUpdateConfig: {
-        updateUserProfile: false,
-      },
-    },
-    3: {
-      responseContent: "🎂 Please enter your date of birth",
+      responseContent: "☎️ Please enter your phone number",
       responseType: "text",
       templateKey: null,
       profileUpdateConfig: {
@@ -728,41 +720,32 @@ const enhamPARegistrationConfig = {
         updateKey: "username",
       },
     },
-    4: {
-      responseType: "text",
-      responseContent: "☎️ Please enter your phone number",
-      templateKey: null,
-      profileUpdateConfig: {
-        updateUserProfile: true,
-        updateKey: "dob",
-      },
-    },
-    5: {
-      responseType: "text",
+    3: {
       responseContent: "📧 Please enter your email address",
+      responseType: "text",
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "alt_phone_number",
       },
     },
-    6: {
+    4: {
       responseType: "text",
-      responseContent: "📮 Please enter your address including postcode",
+      responseContent: "📮 Please enter your postcode",
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "email_address",
       },
     },
-    7: {
+    5: {
       responseType: "text",
       responseContent:
-        "👼 Please enter your emergency contact name & phone number",
+        "🚗 How far are you willing to travel from your postcode. Please choose from the options below:\n\n1. Within 0 - 2 miles\n\n2. Upto 2 - 5 miles\n\n3. Upto 5 - 15 miles\n\n4. 15 + miles",
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
-        updateKey: "address",
+        updateKey: "postcode",
       },
     },
   },

@@ -5,6 +5,7 @@ const {
 } = require("../config/api_base.config");
 const { DatabaseService } = require("../services/DatabaseService");
 const { FlowManagerService } = require("../services/FlowManagerService");
+const { enhamPARegisterConfig } = require("../config/survey.config");
 /**
  * Base class for handling message operations.
  */
@@ -22,6 +23,9 @@ class BaseMessageHandler {
    * @see {@link PostRequestService} for making HTTP requests
    * @see {@link DatabaseService} for database operations
    */
+  static INITIAL_QUESTION_DICT = {
+    "enham-pa-register": enhamPARegisterConfig,
+  };
   constructor({
     req,
     res,
