@@ -123,8 +123,13 @@ class FlowManagerService {
       console.log(data.flowSection, data.flowStep, "to be updated");
       if (
         (data.flowSection === 1 && data.flowStep === 6) ||
-        (data.flowSection === 2 && data.flowStep === 1) ||
-        (data.flowSection === 3 && data.flowStep === 1)
+        (data.flowSection === 2 && data.flowStep === 2) ||
+        (data.flowSection === 3 && data.flowStep === 2) ||
+        (data.flowSection === 4 && data.flowStep === 3) ||
+        (data.flowSection === 5 && data.flowStep === 6) ||
+        (data.flowSection === 6 && data.flowStep === 2) ||
+        (data.flowSection === 7 && data.flowStep === 2) ||
+        (data.flowSection === 8 && data.flowStep === 3)
       ) {
         return NEXT_SECTION;
       }

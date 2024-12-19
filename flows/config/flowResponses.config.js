@@ -850,9 +850,12 @@ const enhamPARegistrationConfig = {
   },
   6: {
     1: {
-      responseType: "text",
-      responseContent:
-        "👯‍♀️ Please confirm that a potential employer may be able to contact a reference if needed",
+      responseType: "template",
+      templateKey: "default_yn",
+      responseContent: {
+        templateVariables:
+          "👯‍♀️ Please confirm that a potential employer may be able to contact a reference if needed",
+      },
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "transport_preferences",
@@ -861,9 +864,12 @@ const enhamPARegistrationConfig = {
   },
   7: {
     1: {
-      responseType: "text",
-      responseContent:
-        "👋 Please confirm on what basis you are happy for us to message you again over WhatsApp, to check your availability & other details are up to date (options: monthly or quarterly)",
+      responseType: "template",
+      responseContent: {
+        templateVariables:
+          "👋 Please confirm on what basis you are happy for us to message you again over WhatsApp, to check your availability & other details are up to date",
+      },
+      templateKey: "enham_pa_scheduling",
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "references",
@@ -891,12 +897,14 @@ const enhamPARegistrationConfig = {
     },
   },
   9: {
-    responseType: "text",
-    responseContent:
-      "🙌 Thanks for filling in the details - you are now registered! We will be in touch as suitable opportunities arise 🥰",
-    profileUpdateConfig: {
-      updateUserProfile: true,
-      updateKey: "further_questions",
+    1: {
+      responseType: "text",
+      responseContent:
+        "🙌 Thanks for filling in the details - you are now registered! We will be in touch as suitable opportunities arise 🥰",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "further_questions",
+      },
     },
   },
 };

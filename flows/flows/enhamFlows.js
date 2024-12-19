@@ -247,6 +247,9 @@ class EnhamVideoDemoFlow extends BaseFlow {
 
 class EnhamPARegisterFlow extends SurveyBaseFlow {
   static FLOW_NAME = "enham-pa-register";
+  static LAST_SECTION = 9;
+  static LAST_STEP = 1;
+
   async handleFlowStep(flowStep, flowSection, cancelSurvey) {
     let flowCompletionStatus = false;
     if (cancelSurvey) {
@@ -255,23 +258,29 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
       flowCompletionStatus = true;
       return flowCompletionStatus;
     }
-    if (flowStep === 1) {
+    if (flowStep === 1 && flowSection === 1) {
       //user started a PA registration flow
-      //TO-DO add a guardrail to not reset it each time
-      const updateDoc = {
-        isPA: true,
-        PAregistrationComplete: false,
-        PA_profile: {},
-      };
-      await this.contactModel.updateContact(this.WaId, updateDoc);
+      if (!this.userInfo?.isPA) {
+        const newRegistrationDoc = {
+          isPA: true,
+          PAregistrationComplete: false,
+          PA_profile: {},
+        };
+        await this.contactModel.updateContact(this.WaId, newRegistrationDoc);
+      }
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_pa_register_intro",
       });
     } else {
       const config = enhamPARegistrationConfig[flowSection]?.[flowStep];
-      const sectionName = enhamPARegistrationConfig[flowSection]?.sectionName;
       if (!config) {
         return flowCompletionStatus;
+      }
+      if (
+        flowStep === EnhamPARegisterFlow.LAST_STEP &&
+        flowSection === EnhamPARegisterFlow.LAST_SECTION
+      ) {
+        flowCompletionStatus = true;
       }
       const {
         responseContent,
@@ -280,7 +289,7 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
         profileUpdateConfig,
       } = config;
       if (profileUpdateConfig.updateUserProfile) {
-        const updatePath = `PA_profile.${sectionName}.${profileUpdateConfig.updateKey}`;
+        const updatePath = `PA_profile.${profileUpdateConfig.updateKey}`;
         const updateDoc = {
           [updatePath]: this.messageContent,
         };
@@ -294,7 +303,7 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
         });
         await this.saveAndSendTextMessage(
           message,
-          EnhamVideoDemoFlow.FLOW_NAME
+          EnhamPARegisterFlow.FLOW_NAME
         );
       } else if (responseType === "template") {
         await this.saveAndSendTemplateMessage({

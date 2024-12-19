@@ -63,17 +63,15 @@ class ContactModel {
     const filteredUpdate = Object.fromEntries(
       Object.entries(update).filter(([_, val]) => val !== undefined)
     );
-    console.log(filteredUpdate);
     try {
       const contactOrganization = await this.organizationsCollection.findOne({
         "organizationPhoneNumber": this.organizationPhoneNumber,
       });
       const contactOrganizationId = contactOrganization._id;
-      const contact = await this.contactsCollection.findOneAndUpdate(
+      await this.contactsCollection.findOneAndUpdate(
         { "WaId": recipient, "organizationId": contactOrganizationId },
         { "$set": filteredUpdate }
       );
-      console.log("found contact!!!!!!!", contact);
     } catch (err) {
       console.log(err);
     }
