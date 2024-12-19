@@ -374,6 +374,63 @@ const enhamPARegisterConfig = {
       questionNumber: "5",
     },
   },
+  2: {
+    1: {
+      questionContent: "dbs",
+      questionNumber: "6",
+    },
+  },
+  3: {
+    1: { questionContent: "relevant_experience", questionNumber: "7" },
+  },
+  4: {
+    1: {
+      questionContent: "qualifications",
+      questionNumber: "8",
+    },
+    2: {
+      questionContent: "languages",
+      questionNumber: "9",
+    },
+  },
+  5: {
+    1: { questionContent: "availability_days_times", questionNumber: "10" },
+    2: {
+      questionContent: "availability_considerations",
+      questionNumber: "11",
+    },
+    3: {
+      questionContent: "work_flexibility",
+      questionNumber: "12",
+    },
+    4: {
+      questionContent: "work_type_preferences",
+      questionNumber: "13",
+    },
+    5: {
+      questionContent: "transport_preferences",
+      questionNumber: "14",
+    },
+  },
+  6: {
+    1: { questionContent: "references", questionNumber: "14" },
+  },
+  7: {
+    1: {
+      questionContent: "availability_check_frequency",
+      questionNumber: "15",
+    },
+  },
+  8: {
+    1: {
+      questionContent: "additional_info",
+      questionNumber: "16",
+    },
+    2: {
+      questionContent: "further_questions",
+      questionNumber: "17",
+    },
+  },
 };
 module.exports = {
   fatMacysSurveyConfig1,

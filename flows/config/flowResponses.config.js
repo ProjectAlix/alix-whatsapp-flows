@@ -710,7 +710,6 @@ const enhamDemoConfig = {
 const enhamPARegistrationConfig = {
   //the update needs to happen on the property that was before what is being asked about now
   1: {
-    sectionName: "personal_info",
     2: {
       responseContent: "☎️ Please enter your phone number",
       responseType: "text",
@@ -741,12 +740,163 @@ const enhamPARegistrationConfig = {
     5: {
       responseType: "text",
       responseContent:
-        "🚗 How far are you willing to travel from your postcode. Please choose from the options below:\n\n1. Within 0 - 2 miles\n\n2. Upto 2 - 5 miles\n\n3. Upto 5 - 15 miles\n\n4. 15 + miles",
+        "🚗 How far are you willing to travel from your postcode. Please choose from the options below:\n\n1. Within 0 - 2 miles\n2. Upto 2 - 5 miles\n3. Upto 5 - 15 miles\n4. 15 + miles",
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "postcode",
       },
+    },
+  },
+  2: {
+    1: {
+      responseType: "template",
+      responseContent: {
+        templateVariables: "✅ Please say if you have a portable DBS",
+      },
+      templateKey: "default_yn",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "max_travel_distance",
+      },
+    },
+  },
+  3: {
+    sectionName: "employment_history",
+    1: {
+      responseType: "text",
+      responseContent:
+        "🥰 Please could you share some details of your previous care related experience, such as who you have worked with. This could be formal or informal (eg if looked after family members) - this could be any reason you are interested in care. You can text or record a voicenote if you'd like. Please share this in one message, you can always add further details at the end.",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "dbs",
+      },
+    },
+  },
+  4: {
+    sectionName: "skills_and_qualifications",
+    1: {
+      responseType: "text",
+      responseContent:
+        "👩‍🏫 Please could you share some details of any qualifications you may have eg NVQs or Care certificates. Qualifications aren't necessary, but feel free to share anything which might be relevant. You can text or record a voicenote if you'd like. Please share this in one message, you can always add further details at the end.",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "relevant_experience",
+      },
+    },
+    2: {
+      responseType: "text",
+      responseContent:
+        "🗣️ Please could you share if you speak any other languages fluently aside from English (eg Polish 🇵🇱, Welsh 🏴󠁧󠁢󠁷󠁬󠁳󠁿, Gujarati , Urdu 🇵🇰, Hindi 🇮🇳, Bengali 🇧🇩, Arabic, Ukrainien 🇺🇦, Punjabi 🇮🇳, Amharic 🇪🇹)",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "qualifications",
+      },
+    },
+  },
+  5: {
+    1: {
+      responseType: "text",
+      responseContent:
+        "🕐 Please choose all of the below days and times you can work. If you have any further availability notes you can state in the next question. Please choose as many options as make sense, and write eg '1, 2, 4'\n\n1. Weekdays\n2. Weekends\n3. Mornings (6am - 11am)\n4. Afternoons (11am - 4pm)\n5. Evenings (4pm - 8pm)\n6. Nights (8pm - midnight)\n7. Overnight\n8. Bank holidays",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "languages",
+      },
+    },
+    2: {
+      responseType: "text",
+      responseContent:
+        "📝 Please state if there is anything else we need to know about your availability ",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "availability_days_times",
+      },
+    },
+    3: {
+      responseType: "text",
+      responseContent:
+        "👍 Please choose all of the below areas you would be willing to consider. \n\n1. Travel (eg accompany someone on a trip for multiple days)\n2. Short shifts (less than 3 hours)",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "availability_considerations",
+      },
+    },
+    4: {
+      responseType: "text",
+      responseContent:
+        '❤️ Please state if you have any preferences for the type of care you do. Please choose as many as you like, and write eg "1, 2, 4"\n\n1. Personal care (eg washing hair, showering)\n2. Household Tasks (eg hoovering, shopping)\n3. Healthcare tasks (eg tube feeding)\n4. Companionship at home\n5. Companionship in the community\n6. No preferences, happy to get stuck in wherever',
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "work_flexibility",
+      },
+    },
+    5: {
+      responseType: "text",
+      responseContent:
+        "🎡 Please state which of the following transport you are happy to engage with. Please choose as many options as make sense, and write eg \"1, 2, 4\"\n\n1. Driving someone in your car (you'd need business insurance in order to do this)\n2. Accompanying someone on public transport\n3. Driving someone else's car (they'd have the insurance in place for this)\n4. Happy to use your car for work related tasks (eg collecting shopping)",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "work_type_preferences",
+      },
+    },
+  },
+  6: {
+    1: {
+      responseType: "text",
+      responseContent:
+        "👯‍♀️ Please confirm that a potential employer may be able to contact a reference if needed",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "transport_preferences",
+      },
+    },
+  },
+  7: {
+    1: {
+      responseType: "text",
+      responseContent:
+        "👋 Please confirm on what basis you are happy for us to message you again over WhatsApp, to check your availability & other details are up to date (options: monthly or quarterly)",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "references",
+      },
+    },
+  },
+  8: {
+    1: {
+      responseType: "text",
+      responseContent:
+        "➕ If there is anything else you would like to add, such as any other information / or a photo / a CV etc - please send us this now and we will add as a note ☺️",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "availability_check_frequency",
+      },
+    },
+    2: {
+      responseType: "text",
+      responseContent:
+        "🙋‍♀️ If you have any further questions about the PA register process, please let us know here and a member of the team will aim to get back to you within a 2 week time period",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "additional_info",
+      },
+    },
+  },
+  9: {
+    responseType: "text",
+    responseContent:
+      "🙌 Thanks for filling in the details - you are now registered! We will be in touch as suitable opportunities arise 🥰",
+    profileUpdateConfig: {
+      updateUserProfile: true,
+      updateKey: "further_questions",
     },
   },
 };

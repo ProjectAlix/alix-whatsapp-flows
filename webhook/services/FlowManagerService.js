@@ -119,6 +119,15 @@ class FlowManagerService {
       if (data.flowStep === 3 || data.flowStep === 4 || data.flowStep === 5) {
         return NEXT_SECTION;
       }
+    } else if (data.flowName === "enham-pa-register") {
+      console.log(data.flowSection, data.flowStep, "to be updated");
+      if (
+        (data.flowSection === 1 && data.flowStep === 6) ||
+        (data.flowSection === 2 && data.flowStep === 1) ||
+        (data.flowSection === 3 && data.flowStep === 1)
+      ) {
+        return NEXT_SECTION;
+      }
     }
 
     return null;
