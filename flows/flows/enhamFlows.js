@@ -257,6 +257,7 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
     }
     if (flowStep === 1) {
       //user started a PA registration flow
+      //TO-DO add a guardrail to not reset it each time
       const updateDoc = {
         isPA: true,
         PAregistrationComplete: false,
@@ -268,6 +269,7 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
       });
     } else {
       const config = enhamPARegistrationConfig[flowSection]?.[flowStep];
+      const sectionName = enhamPARegistrationConfig[flowSection]?.sectionName;
       if (!config) {
         return flowCompletionStatus;
       }
@@ -278,7 +280,7 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
         profileUpdateConfig,
       } = config;
       if (profileUpdateConfig.updateUserProfile) {
-        const updatePath = `PA_profile.${profileUpdateConfig.updateKey}`;
+        const updatePath = `PA_profile.${sectionName}.${profileUpdateConfig.updateKey}`;
         const updateDoc = {
           [updatePath]: this.messageContent,
         };

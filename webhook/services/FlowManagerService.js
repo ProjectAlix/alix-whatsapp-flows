@@ -58,7 +58,7 @@ class FlowManagerService {
    * @type {Object}
    * @description Predefined configuration for conducting a user detail update.
    */
-  static EDIT_DETAILS_QUERY_FIELDS = {
+  static USER_UPDATE_QUERY_FIELDS = {
     1: "detailField",
     2: "detailValue",
   };
@@ -342,9 +342,9 @@ class FlowManagerService {
         "userDetailUpdate.endFlow": true,
       });
     }
-    if (FlowManagerService.EDIT_DETAILS_QUERY_FIELDS[flowStep] && runNextStep) {
+    if (FlowManagerService.USER_UPDATE_QUERY_FIELDS[flowStep] && runNextStep) {
       await flowRef.update({
-        [`userDetailUpdate.${FlowManagerService.EDIT_DETAILS_QUERY_FIELDS[flowStep]}`]:
+        [`userDetailUpdate.${FlowManagerService.USER_UPDATE_QUERY_FIELDS[flowStep]}`]:
           selectionValue,
       });
     }

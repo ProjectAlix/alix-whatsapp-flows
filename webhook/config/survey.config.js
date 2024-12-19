@@ -350,9 +350,39 @@ const enhamPayrollQuizConfig = {
     },
   },
 };
+
+const enhamPARegisterConfig = {
+  1: {
+    2: {
+      questionContent: "username",
+      questionNumber: " 1",
+    },
+    3: {
+      questionContent: "dob",
+      questionNumber: "2",
+    },
+    4: {
+      questionContent: "alt_phone_number",
+      questionNumber: "3",
+    },
+    5: {
+      questionContent: "email_address",
+      questionNumber: "4",
+    },
+    6: {
+      questionContent: "address",
+      questionNumber: "5",
+    },
+    7: {
+      questionContent: "emergency_contact",
+      questionNumber: "6",
+    },
+  },
+};
 module.exports = {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
   fmSocialSurveyDict,
   enhamPayrollQuizConfig,
+  enhamPARegisterConfig,
 };

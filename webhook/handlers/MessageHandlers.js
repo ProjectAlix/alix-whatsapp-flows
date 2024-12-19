@@ -8,6 +8,7 @@ const {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
   enhamPayrollQuizConfig,
+  enhamPARegisterConfig,
 } = require("../config/survey.config");
 
 /**
@@ -335,6 +336,14 @@ class InboundMessageHandler extends BaseMessageHandler {
       flowName: "enham-ai-video-demo",
     });
   }
+
+  async startEnhamPARegisterFlow(userInfo, messageToSave) {
+    await this.startFlow({
+      userInfo,
+      messageToSave,
+      flowName: "enham-pa-register",
+    });
+  }
   /**
    *
    * Handles an existing flow for the user based on their current flow status.
@@ -424,7 +433,6 @@ class InboundMessageHandler extends BaseMessageHandler {
           this.body.Body,
           this.body.MessageSid
         );
-        console.log("current section", flowSection, "currentStep", flowStep);
         const { questionContent, questionNumber } =
           enhamPayrollQuizConfig?.[flowSection]?.[flowStep] || {};
         if (questionContent && questionNumber) {
@@ -455,6 +463,28 @@ class InboundMessageHandler extends BaseMessageHandler {
         fatMacysSurveyConfig2?.[updatedDoc.flowSection]?.[
           updatedDoc.flowStep
         ] || {};
+      if (questionContent && questionNumber) {
+        await this.databaseService.updateFlowSurvey(flowId, {
+          questionContent,
+          questionNumber,
+        });
+      }
+    } else if (flowName === "enham-pa-register") {
+      await this.databaseService.updateFlowWithResponse(
+        flowId,
+        this.body.Body,
+        this.body.MessageSid
+      );
+      messageData.cancelSurvey = await this.updateSurveyCancellation(flowId);
+      const { flowSection, flowStep } =
+        await this.flowManagerService.createNextSectionUpdate({
+          WaId: this.body.WaId,
+          buttonPayload: this.buttonPayload,
+        });
+      const { questionContent, questionNumber } =
+        enhamPARegisterConfig?.[flowSection]?.[flowStep] || {};
+      messageData.flowSection = flowSection;
+      messageData.flowStep = flowStep;
       if (questionContent && questionNumber) {
         await this.databaseService.updateFlowSurvey(flowId, {
           questionContent,

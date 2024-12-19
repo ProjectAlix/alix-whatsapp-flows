@@ -710,51 +710,59 @@ const enhamDemoConfig = {
 const enhamPARegistrationConfig = {
   //the update needs to happen on the property that was before what is being asked about now
   1: {
+    sectionName: "personal_info",
     2: {
-      responseContent: {
-        templateVariables:
-          "Great, before we start:\n\nDo you have an in-date Portable DBS? ✅\n\nYou should be able to look up your latest registration on this government website",
-      },
-      responseType: "template",
-      templateKey: "default_yn",
+      responseContent: "👋 Please enter your name",
+      responseType: "text",
+      templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: false,
       },
     },
     3: {
-      responseContent: `Thanks! It would be great to check which languages you're able to support:\n\n${
-        "1. English 🇬🇧\n\n" +
-        "2. Welsh 🏴\n\n" +
-        "3. Hindi/Urdu 🇮🇳🇵🇰\n\n" +
-        "4. Polish 🇵🇱\n\n" +
-        "5. Arabic 🇸🇦\n\n"
-      }\n\nPlease enter your response in the following format: 1, 2, 3`,
+      responseContent: "🎂 Please enter your date of birth",
       responseType: "text",
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
-        updateKey: "in-date Portable DBS",
+        updateKey: "username",
       },
     },
     4: {
-      responseType: "template",
-      responseContent: {
-        templateVariables:
-          "Great, thanks for sharing your details. You can edit your details at any point by writing ‘edit details’\n\nAre you happy for us to check-in 👋around your availability on a:",
-      },
-      templateKey: "enham_pa_scheduling",
+      responseType: "text",
+      responseContent: "☎️ Please enter your phone number",
+      templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
-        updateKey: "Language",
+        updateKey: "dob",
       },
     },
     5: {
-      responseType: "none", // Indicates no message will be sent
-      responseContent: null, // Not required for this step
-      templateKey: null, // Not applicable
+      responseType: "text",
+      responseContent: "📧 Please enter your email address",
+      templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
-        updateKey: "Availability Preference",
+        updateKey: "alt_phone_number",
+      },
+    },
+    6: {
+      responseType: "text",
+      responseContent: "📮 Please enter your address including postcode",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "email_address",
+      },
+    },
+    7: {
+      responseType: "text",
+      responseContent:
+        "👼 Please enter your emergency contact name & phone number",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "address",
       },
     },
   },
