@@ -249,6 +249,12 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
   static FLOW_NAME = "enham-pa-register";
   static LAST_SECTION = 9;
   static LAST_STEP = 1;
+  static REGISTRATION_COMPLETION_SECTION = 8;
+  static REGISTRATION_COMPLETION_STEP = 1;
+  static DAYS_UNTIL_REMINDER = {
+    "Monthly basis": 30,
+    "Quarterly basis": 90,
+  };
 
   async handleFlowStep(flowStep, flowSection, cancelSurvey) {
     let flowCompletionStatus = false;
@@ -281,6 +287,21 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
         flowSection === EnhamPARegisterFlow.LAST_SECTION
       ) {
         flowCompletionStatus = true;
+      }
+      if (
+        flowStep === EnhamPARegisterFlow.REGISTRATION_COMPLETION_STEP &&
+        flowSection === EnhamPARegisterFlow.REGISTRATION_COMPLETION_SECTION
+      ) {
+        const daysUntilReminder =
+          EnhamPARegisterFlow.DAYS_UNTIL_REMINDER[this.messageContent];
+        const updateDoc = {
+          PAregistrationComplete: true,
+          registrationDate: new Date(),
+          nextAvailabilityCheckDate: new Date(
+            Date.now() + daysUntilReminder * 24 * 60 * 60 * 1000
+          ),
+        };
+        await this.contactModel.updateContact(this.WaId, updateDoc);
       }
       const {
         responseContent,
