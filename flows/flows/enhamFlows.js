@@ -266,11 +266,11 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
     }
     if (flowStep === 1 && flowSection === 1) {
       //user started a PA registration flow
-      if (!this.userInfo?.isPA) {
+      if (!this.userInfo?.isEnhamPA) {
         const newRegistrationDoc = {
-          isPA: true,
-          PAregistrationComplete: false,
-          PA_profile: {},
+          isEnhamPA: true,
+          EnhamPA_registrationComplete: false,
+          EnhamPA_profile: {},
         };
         await this.contactModel.updateContact(this.WaId, newRegistrationDoc);
       }
@@ -295,11 +295,12 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
         const daysUntilReminder =
           EnhamPARegisterFlow.DAYS_UNTIL_REMINDER[this.messageContent];
         const updateDoc = {
-          PAregistrationComplete: true,
-          registrationDate: new Date(),
-          nextAvailabilityCheckDate: new Date(
+          EnhamPA_registrationComplete: true,
+          EnhamPA_registrationDate: new Date(),
+          EnhamPA_nextDetailCheckDate: new Date(
             Date.now() + daysUntilReminder * 24 * 60 * 60 * 1000
           ),
+          EnhamPA_lastDetailCheckDate: null,
         };
         await this.contactModel.updateContact(this.WaId, updateDoc);
       }

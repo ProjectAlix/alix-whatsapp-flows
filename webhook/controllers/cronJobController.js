@@ -18,6 +18,11 @@ const sendSurveyReminder = async (req, res, next) => {
   await messageHandler.handle();
 };
 
+const sendScheduledFlow = async (req, res, next) => {
+  console.log(req.body);
+  return res.sendStatus(200);
+};
 module.exports = {
   sendSurveyReminder,
+  sendScheduledFlow,
 };

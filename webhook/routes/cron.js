@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const cronJobController = require("../controllers/cronJobController");
-const { buildFlowTriggerRequest } = require("../middleware/customBodyFields");
+const {
+  buildSurveyReminderRequest,
+  buildDetailCheckRequest,
+} = require("../middleware/customBodyFields");
 //cron job needs to send
 /*
 {
@@ -11,8 +14,13 @@ const { buildFlowTriggerRequest } = require("../middleware/customBodyFields");
 */
 router.post(
   "/survey-reminder",
-  buildFlowTriggerRequest,
+  buildSurveyReminderRequest,
   cronJobController.sendSurveyReminder
 );
 
+router.post(
+  "/scheduled-flow",
+  buildDetailCheckRequest,
+  cronJobController.sendScheduledFlow
+);
 module.exports = router;

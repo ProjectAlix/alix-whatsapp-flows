@@ -69,9 +69,77 @@ class DatabaseService {
    * @param {string} env - The environment ("production" or otherwise) to adjust the response.
    * @returns {Promise<Object>} An object containing the flow document and list of contacts.
    */
-  async getUnresponsiveContacts(flowName, reminderTime, organizationId) {
+  async getScheduledContacts(flowName, currentDateTime, organizationId) {
+    const nextReminderUpdateConfig = {
+      "Monthly basis": 30,
+      "Quarterly basis": 90,
+    };
     const flow = await this.availableFlowsCollection.findOne({
       "flowName": flowName,
+    });
+    const scheduledContacts = await this.contactCollection
+      .aggregate([
+        {
+          $match: {
+            "organizationId": new ObjectId(organizationId),
+            "isEnhamPA": true,
+            $expr: {
+              $and: [
+                {
+                  $eq: [
+                    { $dayOfMonth: "$EnhamPA_nextDetailCheckDate" },
+                    { $dayOfMonth: currentDateTime },
+                  ],
+                },
+                {
+                  $eq: [
+                    { $month: "$EnhamPA_nextDetailCheckDate" },
+                    { $month: currentDateTime },
+                  ],
+                },
+                {
+                  $eq: [
+                    { $year: "$EnhamPA_nextDetailCheckDate" },
+                    { $year: currentDateTime },
+                  ],
+                },
+              ],
+            },
+          },
+        },
+      ])
+      .toArray();
+    for (const contact of scheduledContacts) {
+      const frequency = contact.EnhamPA_profile.availability_check_frequency;
+      const daysToAdd = nextReminderUpdateConfig[frequency];
+      if (!daysToAdd) {
+        console.warn(`No configuration found for frequency: ${frequency}`);
+        continue;
+      }
+
+      const nextReminderDate = new Date(
+        new Date(contact.EnhamPA_nextDetailCheckDate).getTime() +
+          daysToAdd * 24 * 60 * 60 * 1000
+      );
+      await this.contactCollection.updateOne(
+        { _id: contact._id },
+        {
+          $set: {
+            EnhamPA_nextDetailCheckDate: nextReminderDate,
+            EnhamPA_lastDetailCheckDate: currentDateTime,
+          },
+        }
+      );
+    }
+    console.log(scheduledContacts);
+    return {
+      flow,
+      contactList: scheduledContacts,
+    };
+  }
+  async getUnresponsiveContacts(flowName, reminderTime, organizationId) {
+    const flow = await this.availableFlowsCollection.findOne({
+      flowName,
     });
     const contactReminderField = `${flowName}_reminderSent`;
     const unansweredSurveys = await this.sentFlowsCollection
@@ -127,7 +195,7 @@ class DatabaseService {
     }
     const testUser = { WaId: "38269372208", ProfileName: "Daria" };
     return {
-      flow: flow,
+      flow,
       contactList: [...WaIds, testUser],
     };
   }
