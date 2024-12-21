@@ -63,16 +63,9 @@ class DatabaseService {
       console.log(err);
     }
   }
-  /**
-   * Retrieves contacts who have not responded to a flow in the specified time window and sends a reminder.
-   * @param {string} flowName - The name of the flow to check.
-   * @param {Date} reminderTime - The time threshold for determining whether to send a reminder.
-   * @param {string} organizationId - The ID of the organization whose contacts are being checked.
-   * @param {string} env - The environment ("production" or otherwise) to adjust the response.
-   * @returns {Promise<Object>} An object containing the flow document and list of contacts.
-   */
   async getScheduledContacts(flowName, currentDateTime, organizationId) {
     //TO-DO: test this
+    console.log(flowName);
     const { schedules, prefix, topLevelFlag, scheduleFrequencyFieldPath } =
       nextReminderUpdateConfig[flowName];
     const flow = await this.availableFlowsCollection.findOne({

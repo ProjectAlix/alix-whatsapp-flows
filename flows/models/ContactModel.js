@@ -78,7 +78,6 @@ class ContactModel {
   }
   async updateContactNestedField(recipient, updatePath, updateData, updateKey) {
     try {
-      // Fetch the organization ID based on the organization phone number
       const contactOrganization = await this.organizationsCollection.findOne({
         organizationPhoneNumber: this.organizationPhoneNumber,
       });

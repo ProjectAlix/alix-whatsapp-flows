@@ -18,17 +18,6 @@ const processOutboundFlow = async (req, res, next) => {
   await messageHandler.handle();
 };
 
-const sendScheduledFlow = async (req, res, next) => {
-  const messageHandler = new OutboundFlowHandler({
-    req,
-    res,
-    organizationPhoneNumber: req.body.organizationPhoneNumber,
-    firestore,
-    clientSideTriggered: false,
-    isReminder: false,
-  });
-  await messageHandler.handle();
-};
 module.exports = {
   processOutboundFlow,
 };
