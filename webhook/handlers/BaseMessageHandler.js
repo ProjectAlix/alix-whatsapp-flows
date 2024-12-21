@@ -5,7 +5,7 @@ const {
 } = require("../config/api_base.config");
 const { DatabaseService } = require("../services/DatabaseService");
 const { FlowManagerService } = require("../services/FlowManagerService");
-const { enhamPARegisterConfig } = require("../config/survey.config");
+const { enhamPARegisterConfig } = require("../config/flows.config");
 /**
  * Base class for handling message operations.
  */

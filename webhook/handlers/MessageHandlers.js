@@ -9,7 +9,7 @@ const {
   fatMacysSurveyConfig2,
   enhamPayrollQuizConfig,
   enhamPARegisterConfig,
-} = require("../config/survey.config");
+} = require("../config/flows.config");
 
 /**
  * Service for handling inbound messages from the Twilio API and triggering flows.

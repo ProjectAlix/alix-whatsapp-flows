@@ -432,10 +432,19 @@ const enhamPARegisterConfig = {
     },
   },
 };
+const nextReminderUpdateConfig = {
+  "enham-pa-detail-check": {
+    schedules: { "Monthly basis": 30, "Quarterly basis": 90 },
+    prefix: "EnhamPA",
+    topLevelFlag: "isEnhamPA",
+    scheduleFrequencyFieldPath: "EnhamPA_profile.availability_check_frequency",
+  },
+};
 module.exports = {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
   fmSocialSurveyDict,
   enhamPayrollQuizConfig,
   enhamPARegisterConfig,
+  nextReminderUpdateConfig,
 };

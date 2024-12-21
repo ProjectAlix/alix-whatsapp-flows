@@ -1,5 +1,7 @@
 const { ObjectId } = require("mongodb");
 const { logFlowStatus } = require("../helpers/logging.helpers");
+const { nextReminderUpdateConfig } = require("../config/flows.config");
+const { getNestedField } = require("../helpers/formatting.helpers");
 /**
  * Service class to handle database operations related to contacts, organizations, messages, and flows.
  */
@@ -70,10 +72,9 @@ class DatabaseService {
    * @returns {Promise<Object>} An object containing the flow document and list of contacts.
    */
   async getScheduledContacts(flowName, currentDateTime, organizationId) {
-    const nextReminderUpdateConfig = {
-      "Monthly basis": 30,
-      "Quarterly basis": 90,
-    };
+    //TO-DO: test this
+    const { schedules, prefix, topLevelFlag, scheduleFrequencyFieldPath } =
+      nextReminderUpdateConfig[flowName];
     const flow = await this.availableFlowsCollection.findOne({
       "flowName": flowName,
     });
@@ -82,24 +83,24 @@ class DatabaseService {
         {
           $match: {
             "organizationId": new ObjectId(organizationId),
-            "isEnhamPA": true,
+            [topLevelFlag]: true,
             $expr: {
               $and: [
                 {
                   $eq: [
-                    { $dayOfMonth: "$EnhamPA_nextDetailCheckDate" },
+                    { $dayOfMonth: `$${prefix}_nextDetailCheckDate` },
                     { $dayOfMonth: currentDateTime },
                   ],
                 },
                 {
                   $eq: [
-                    { $month: "$EnhamPA_nextDetailCheckDate" },
+                    { $month: `$${prefix}_nextDetailCheckDate` },
                     { $month: currentDateTime },
                   ],
                 },
                 {
                   $eq: [
-                    { $year: "$EnhamPA_nextDetailCheckDate" },
+                    { $year: `$${prefix}_nextDetailCheckDate` },
                     { $year: currentDateTime },
                   ],
                 },
@@ -109,28 +110,38 @@ class DatabaseService {
         },
       ])
       .toArray();
-    for (const contact of scheduledContacts) {
-      const frequency = contact.EnhamPA_profile.availability_check_frequency;
-      const daysToAdd = nextReminderUpdateConfig[frequency];
-      if (!daysToAdd) {
-        console.warn(`No configuration found for frequency: ${frequency}`);
-        continue;
-      }
-
-      const nextReminderDate = new Date(
-        new Date(contact.EnhamPA_nextDetailCheckDate).getTime() +
-          daysToAdd * 24 * 60 * 60 * 1000
-      );
-      await this.contactCollection.updateOne(
-        { _id: contact._id },
-        {
-          $set: {
-            EnhamPA_nextDetailCheckDate: nextReminderDate,
-            EnhamPA_lastDetailCheckDate: currentDateTime,
-          },
+    const bulkOps = scheduledContacts
+      .map((contact) => {
+        const frequency = getNestedField(contact, scheduleFrequencyFieldPath);
+        const daysToAdd = schedules[frequency];
+        if (!daysToAdd) {
+          console.warn(`No configuration found for frequency: ${frequency}`);
+          return null;
         }
-      );
+
+        const nextReminderDate = new Date(
+          new Date(contact[`${prefix}_nextDetailCheckDate`]).getTime() +
+            daysToAdd * 24 * 60 * 60 * 1000
+        );
+
+        return {
+          updateOne: {
+            filter: { _id: contact._id },
+            update: {
+              $set: {
+                [`${prefix}_nextDetailCheckDate`]: nextReminderDate,
+                [`${prefix}_lastDetailCheckDate`]: currentDateTime,
+              },
+            },
+          },
+        };
+      })
+      .filter(Boolean);
+
+    if (bulkOps.length > 0) {
+      await this.contactCollection.bulkWrite(bulkOps);
     }
+
     console.log(scheduledContacts);
     return {
       flow,
