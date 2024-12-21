@@ -13,10 +13,11 @@ const buildSurveyReminderRequest = async (req, res, next) => {
   console.log("flow", flow, "contactList to be sent a reminder", contactList);
   req.body.flow = flow;
   req.body.contactList = contactList;
+  req.body.isReminder = true;
   next();
 };
 
-const buildDetailCheckRequest = async (req, res, next) => {
+const buildScheduledFlowRequest = async (req, res, next) => {
   const dbService = new DatabaseService(req.app.locals.db);
   const now = new Date();
   const flowName = req.body.flowName;
@@ -28,9 +29,10 @@ const buildDetailCheckRequest = async (req, res, next) => {
   );
   req.body.flow = flow;
   req.body.contactList = contactList;
+  req.body.isReminder = false;
   next();
 };
 module.exports = {
   buildSurveyReminderRequest,
-  buildDetailCheckRequest,
+  buildScheduledFlowRequest,
 };

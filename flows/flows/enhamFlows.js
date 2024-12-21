@@ -326,11 +326,16 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
         profileUpdateConfig,
       } = config;
       if (profileUpdateConfig.updateUserProfile) {
-        const updatePath = `PA_profile.${profileUpdateConfig.updateKey}`;
+        const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
         const updateDoc = {
-          [updatePath]: this.messageContent,
+          [profileUpdateConfig.updateKey]: this.messageContent,
         };
-        await this.contactModel.updateContact(this.WaId, updateDoc);
+        await this.contactModel.updateContactNestedField(
+          this.WaId,
+          updatePath,
+          updateDoc,
+          profileUpdateConfig.updateKey
+        );
       }
       if (responseType === "text") {
         const message = createTextMessage({

@@ -1,6 +1,6 @@
 const { firestore } = require("../config/firestore.config");
 const { OutboundFlowHandler } = require("../handlers/MessageHandlers");
-const sendSurveyReminder = async (req, res, next) => {
+const processOutboundFlow = async (req, res, next) => {
   //add flow and contactList to req body in middleware
   const messageHandler = new OutboundFlowHandler({
     req,
@@ -8,7 +8,7 @@ const sendSurveyReminder = async (req, res, next) => {
     organizationPhoneNumber: req.body.organizationPhoneNumber,
     firestore,
     clientSideTriggered: false,
-    isReminder: true,
+    isReminder: req.body.isReminder,
   });
   if (process.env.NODE_ENV !== "production") {
     return res
@@ -30,6 +30,5 @@ const sendScheduledFlow = async (req, res, next) => {
   await messageHandler.handle();
 };
 module.exports = {
-  sendSurveyReminder,
-  sendScheduledFlow,
+  processOutboundFlow,
 };

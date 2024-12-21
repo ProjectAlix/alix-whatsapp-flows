@@ -76,6 +76,40 @@ class ContactModel {
       console.log(err);
     }
   }
+  async updateContactNestedField(recipient, updatePath, updateData, updateKey) {
+    try {
+      // Fetch the organization ID based on the organization phone number
+      const contactOrganization = await this.organizationsCollection.findOne({
+        organizationPhoneNumber: this.organizationPhoneNumber,
+      });
+      const contactOrganizationId = contactOrganization._id;
+
+      const updateOperation = {
+        $set: {},
+      };
+
+      // Check if the nested field already exists, and set it accordingly
+      if (
+        updateData &&
+        Object.prototype.hasOwnProperty.call(updateData, updateKey)
+      ) {
+        // Field exists, update it directly
+        updateOperation.$set[updatePath] = updateData[updateKey];
+      } else {
+        // Field doesn't exist, create it
+        updateOperation.$set[updatePath] = updateData;
+      }
+      // Update the nested field in the contacts collection
+      await this.contactsCollection.findOneAndUpdate(
+        { WaId: recipient, organizationId: contactOrganizationId },
+        updateOperation,
+        { upsert: true }
+      );
+    } catch (err) {
+      console.error("Error updating nested field:", err);
+    }
+  }
+
   async incrementContactField(recipient, update) {
     try {
       const contactOrganization = await this.organizationsCollection.findOne({
