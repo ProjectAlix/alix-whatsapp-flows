@@ -9,6 +9,7 @@ const {
   runFMSocialSurveyFlow,
   runEnhamDemoFlow,
   runEnhamPARegisterFlow,
+  runEnhamDetailCheckFlow,
 } = require("../handlers/flowHandlers");
 const { ContactModel } = require("../models/ContactModel");
 
@@ -133,6 +134,12 @@ async function flowController(req, res, next) {
         flowStep,
         flowSection,
         cancelSurvey,
+      });
+    } else if (flow === "enham-pa-detail-check") {
+      flowCompletionStatus = await runEnhamDetailCheckFlow({
+        flowConstructorParams,
+        flowStep,
+        flowSection,
       });
     }
     res.status(200).send({ flowCompletionStatus });

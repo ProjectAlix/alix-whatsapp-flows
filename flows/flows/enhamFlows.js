@@ -255,6 +255,21 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
     "Monthly basis": 30,
     "Quarterly basis": 90,
   };
+  constructor({
+    userInfo,
+    userMessage,
+    contactModel,
+    organizationPhoneNumber,
+    organizationMessagingServiceSid,
+  }) {
+    super({
+      userInfo,
+      userMessage,
+      contactModel,
+      organizationPhoneNumber,
+      organizationMessagingServiceSid,
+    });
+  }
 
   async handleFlowStep(flowStep, flowSection, cancelSurvey) {
     let flowCompletionStatus = false;
@@ -338,8 +353,40 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
   }
 }
 
+class EnhamDetailCheckFlow extends BaseFlow {
+  static FLOW_NAME = "enham-pa-detail-check";
+  constructor({
+    userInfo,
+    userMessage,
+    contactModel,
+    organizationPhoneNumber,
+    organizationMessagingServiceSid,
+  }) {
+    super({
+      userInfo,
+      userMessage,
+      contactModel,
+      organizationPhoneNumber,
+      organizationMessagingServiceSid,
+    });
+  }
+  async handleFlowStep(flowStep, flowSection) {
+    let flowCompletionStatus = false;
+    if (flowStep === 1 && flowSection === 1) {
+      await this.saveAndSendTemplateMessage({
+        templateKey: "enham_availability_check_intro",
+        templateVariables: {
+          templateVariables: this.userInfo.ProfileName,
+        },
+      });
+    }
+    return flowCompletionStatus;
+  }
+}
+
 module.exports = {
   EnhamComboFlow,
   EnhamVideoDemoFlow,
   EnhamPARegisterFlow,
+  EnhamDetailCheckFlow,
 };

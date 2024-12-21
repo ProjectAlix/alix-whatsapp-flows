@@ -19,8 +19,15 @@ const sendSurveyReminder = async (req, res, next) => {
 };
 
 const sendScheduledFlow = async (req, res, next) => {
-  console.log(req.body);
-  return res.sendStatus(200);
+  const messageHandler = new OutboundFlowHandler({
+    req,
+    res,
+    organizationPhoneNumber: req.body.organizationPhoneNumber,
+    firestore,
+    clientSideTriggered: false,
+    isReminder: false,
+  });
+  await messageHandler.handle();
 };
 module.exports = {
   sendSurveyReminder,
