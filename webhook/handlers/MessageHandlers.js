@@ -87,7 +87,6 @@ class InboundMessageHandler extends BaseMessageHandler {
         await this.handleExistingFlow(userInfo, messageToSave);
       }
     } catch (err) {
-      console.error(err);
       await this.handleFlowError(err);
       this.res.status(500).send(err);
     }
@@ -135,12 +134,7 @@ class InboundMessageHandler extends BaseMessageHandler {
    * @returns {Promise<void>}
    */
   async startFlow({ userInfo, messageToSave, flowName, extraData }) {
-    if (
-      !(await this.databaseService.checkFlowPermission(
-        flowName,
-        messageToSave.OrganizationId
-      ))
-    ) {
+    if (!(await this.isFlowEnabled(flowName, messageToSave.OrganizationId))) {
       return this.res.status(403).json({ error: "Permission Denied" });
     }
     const trackedFlowId = uuidv4(); //create an ID to track the flow by
@@ -159,24 +153,7 @@ class InboundMessageHandler extends BaseMessageHandler {
     });
     await this.flowManagerService.createNewFlow({ messageData, extraData }); //new flow created in firestore, will be retrieved by `handleExistingFlow` on the next message from the user
     //flow saved to mongoDB
-    let extraFields = {};
-    if (BaseMessageHandler.INITIAL_QUESTION_DICT[flowName]) {
-      const { questionContent, questionNumber } =
-        BaseMessageHandler.INITIAL_QUESTION_DICT[flowName]?.[
-          messageData.flowSection
-        ]?.[messageData.flowStep] || {}; //this is so ugly HAHAHAHAHAHAHAHA
-      console.log(questionContent, questionNumber);
-      extraFields = {
-        surveyResponses: [
-          {
-            questionContent,
-            questionNumber,
-            CreatedAt: new Date(),
-            originalMessageSid: messageData.MessageSid,
-          },
-        ],
-      };
-    }
+    const extraFields = this.getInitialSurveyQuestion(flowName, messageData);
     await this.databaseService.saveFlow({
       WaId: userInfo.WaId,
       trackedFlowId,
@@ -207,18 +184,6 @@ class InboundMessageHandler extends BaseMessageHandler {
     }
     this.res.status(204).send();
   }
-
-  /**
-   * Onboards a new user by saving their data and initiating the onboarding flow.
-   *
-   * @param {Object} userInfo - The data of the user to be onboarded.
-   * @param {Object} messageToSave - Message data to be saved to the database and used for onboarding.
-   *
-   * Calls:
-   * - `startFlow`: Initiates the "onboarding" flow with the provided user and message data.
-   *
-   * @returns {Promise<void>} - Resolves when the user is successfully onboarded and the flow is started.
-   */
 
   async startSampleFlow(userInfo, messageToSave) {
     const sampleVersion = await this.startFlow({

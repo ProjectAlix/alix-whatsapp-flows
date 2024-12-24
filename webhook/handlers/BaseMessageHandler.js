@@ -79,6 +79,33 @@ class BaseMessageHandler {
       err,
     });
   }
+  async isFlowEnabled(flowName, organizationId) {
+    const isEnabled = await this.databaseService.checkFlowPermission(
+      flowName,
+      organizationId
+    );
+    return isEnabled;
+  }
+  getInitialSurveyQuestion(flowName, messageData) {
+    const { INITIAL_QUESTION_DICT } = BaseMessageHandler;
+    const initialQuestion =
+      INITIAL_QUESTION_DICT[flowName]?.[messageData.flowSection]?.[
+        messageData.flowStep
+      ];
+
+    if (!initialQuestion) return {};
+    const { questionContent, questionNumber } = initialQuestion;
+    return {
+      surveyResponses: [
+        {
+          questionContent,
+          questionNumber,
+          CreatedAt: new Date(),
+          originalMessageSid: messageData.MessageSid,
+        },
+      ],
+    };
+  }
   /**
    * Creates message data to be sent based on the user and flow information.
    * @param {Object} params - Parameters for creating message data.
