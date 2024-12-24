@@ -241,21 +241,6 @@ class InboundMessageHandler extends BaseMessageHandler {
    * @returns {Promise<void>} - Resolves when the user is successfully onboarded and the flow is started.
    */
 
-  async onboardUser(userInfo, messageToSave) {
-    await this.startFlow({ userInfo, messageToSave, flowName: "onboarding" });
-  }
-
-  /**
-   * Starts the signposting flow for the user.
-   *
-   * @param {Object} userInfo - The data of the user to start the flow for.
-   * @param {Object} messageToSave - Message data to be used in the signposting flow.
-   * @param {string} sampleVersion - Sets whether to start the class based (1) or function based (2) flow
-   * Calls:
-   * - `startFlow`: Starts the "sample" flow with sample version set.
-   *
-   * @returns {Promise<void>} - Resolves when the flow has been started.
-   */
   async startSampleFlow(userInfo, messageToSave) {
     const sampleVersion = await this.startFlow({
       userInfo,
@@ -291,30 +276,6 @@ class InboundMessageHandler extends BaseMessageHandler {
     });
   }
 
-  /**
-   * Starts the edit details flow for the user to update information.
-   *
-   * @param {Object} userInfo - The data of the user initiating the edit details flow.
-   * @param {Object} messageToSave - Message data to be used in the edit details flow.
-   *
-   * Calls:
-   * - `startFlow`: Starts the "edit-details" flow with `userDetailUpdate` extra data.
-   *
-   * @returns {Promise<void>} - Resolves when the flow has been started.
-   */
-  async startEditDetailsFlow(userInfo, messageToSave) {
-    const extraData = {
-      userDetailUpdate: {
-        endFlow: false,
-      },
-    };
-    await this.startFlow({
-      userInfo,
-      messageToSave,
-      flowName: "edit-details",
-      extraData,
-    });
-  }
   /**
    * Starts the survey flow for the user.
    *
@@ -407,11 +368,6 @@ class InboundMessageHandler extends BaseMessageHandler {
     // Handle flow-specific data updates based on the flow type, these methods are specific to each flow type so for handling any advanced logic you will likely need to add your own
     if (flowName === "signposting") {
       messageData.userSelection = await this.updateUserSignpostingSelection(
-        flowId,
-        flowStep
-      );
-    } else if (flowName === "edit-details") {
-      messageData.userDetailUpdate = await this.updateUserDetail(
         flowId,
         flowStep
       );
@@ -540,20 +496,6 @@ class InboundMessageHandler extends BaseMessageHandler {
       selectionValue: this.body.Body,
     });
     return updatedDoc?.userSelection;
-  }
-  /**
-   * Updates user's details for the edit-details flow.
-   * @param {string} flowId - The unique flow ID.
-   * @param {number} currentFlowStep - The current step in the flow.
-   * @returns {Promise<string>} - The updated user detail.
-   */
-  async updateUserDetail(flowId, currentFlowStep) {
-    const updatedDoc = await this.flowManagerService.createUserDetailUpdate({
-      flowId,
-      flowStep: currentFlowStep,
-      selectionValue: this.body.Body,
-    });
-    return updatedDoc?.userDetailUpdate;
   }
 
   /**

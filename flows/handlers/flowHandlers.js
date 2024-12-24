@@ -4,11 +4,7 @@ const {
   EnhamPARegisterFlow,
   EnhamDetailCheckFlow,
 } = require("../flows/enhamFlows");
-const {
-  OnboardingFlow,
-  SignpostingFlow,
-  EditDetailsFlow,
-} = require("../flows/alixFlows");
+const { SignpostingFlow } = require("../flows/alixFlows");
 const { FMSocialSurveyFlow, FatMacysSurveyFlow } = require("../flows/fmFlows");
 const { StepBasedFlow } = require("../flows/samples/StepBasedFlow");
 const { SupportOptionService } = require("../services/dn/SupportOptionService");
@@ -192,34 +188,6 @@ async function runSurveyFlow({
   );
   return flowCompletionStatus;
 }
-/**
- * Executes the onboarding flow.
- *
- * @async
- * @function
- * @param {Object} params - Parameters for running the onboarding flow.
- * @param {Object} params.flowStep - The current step of the flow.
- * @param {Object} params.flowConstructorParams - Common parameters to initialize a flow.
- * @returns {Promise<boolean>} The completion status of the flow.
- */
-async function runOnboardingFlow({ flowStep, flowConstructorParams }) {
-  const {
-    userInfo,
-    userMessage,
-    contactModel,
-    organizationPhoneNumber,
-    organizationMessagingServiceSid,
-  } = flowConstructorParams;
-  const onboardingFlow = new OnboardingFlow({
-    userInfo,
-    userMessage,
-    contactModel,
-    organizationPhoneNumber,
-    organizationMessagingServiceSid,
-  });
-  const flowCompletionStatus = await onboardingFlow.handleFlowStep(flowStep);
-  return flowCompletionStatus;
-}
 
 /**
  * Executes the signposting flow, providing options and signposts for user selections.
@@ -265,42 +233,6 @@ async function runSignpostingFlow({
 }
 
 /**
- * Executes the edit details flow for updating user information in Mongo.
- *
- * @async
- * @function
- * @param {Object} params - Parameters for running the edit details flow.
- * @param {Object} params.flowStep - The current step of the flow.
- * @param {Object} params.flowConstructorParams - Common parameters to initialize a flow.
- * @param {Object} params.userDetailUpdate - Object containing updated user details.
- * @returns {Promise<boolean>} The completion status of the flow.
- */
-async function runEditDetailsFlow({
-  flowStep,
-  flowConstructorParams,
-  userDetailUpdate,
-}) {
-  const {
-    userInfo,
-    userMessage,
-    contactModel,
-    organizationPhoneNumber,
-    organizationMessagingServiceSid,
-  } = flowConstructorParams;
-  const editDetailsFlow = new EditDetailsFlow({
-    userInfo,
-    userMessage,
-    contactModel,
-    organizationPhoneNumber,
-    organizationMessagingServiceSid,
-  });
-  const flowCompletionStatus = await editDetailsFlow.handleFlowStep(
-    flowStep,
-    userDetailUpdate
-  );
-  return flowCompletionStatus;
-}
-/**
  * Executes a sample step-based flow.
  *
  * @async
@@ -329,9 +261,7 @@ async function runStepBasedFlow({ flowConstructorParams, flowStep }) {
 }
 
 module.exports = {
-  runEditDetailsFlow,
   runEnhamComboFlow,
-  runOnboardingFlow,
   runSignpostingFlow,
   runStepBasedFlow,
   runSurveyFlow,

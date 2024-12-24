@@ -332,47 +332,6 @@ class FlowManagerService {
   }
 
   /**
-   * Updates user details within a flow based on their selection and adds optional data fields.
-   * @param {Object} params - Parameters for detail update.
-   * @param {string} params.flowId - The flow ID.
-   * @param {number} params.flowStep - Current step in the flow.
-   * @param {string} params.selectionValue - User's selected value.
-   * @returns {Promise<Object|null>} Updated document data or null if not found.
-   * @see {@link ../handlers/MessageHandlers.js~InboundMessageHandler#updateUserDetail}
-   */
-
-  async createUserDetailUpdate({ flowId, flowStep, selectionValue }) {
-    const runNextStep =
-      !FlowManagerService.ADD_UPDATE_MESSAGES.includes(selectionValue); //User does not want to update anything else, TO-DO: refactor to use button Id
-    const flowRef = this.db.collection("flows").doc(flowId);
-    if (selectionValue === FlowManagerService.ADD_UPDATE_MESSAGES[0]) {
-      await flowRef.update({
-        flowStep: 1,
-        userDetailUpdate: FieldValue.delete(),
-      });
-    }
-    if (selectionValue === FlowManagerService.ADD_UPDATE_MESSAGES[1]) {
-      await flowRef.update({
-        "userDetailUpdate.endFlow": true,
-      });
-    }
-    if (FlowManagerService.USER_UPDATE_QUERY_FIELDS[flowStep] && runNextStep) {
-      await flowRef.update({
-        [`userDetailUpdate.${FlowManagerService.USER_UPDATE_QUERY_FIELDS[flowStep]}`]:
-          selectionValue,
-      });
-    }
-    const updatedDoc = await flowRef.get();
-
-    if (updatedDoc.exists) {
-      return updatedDoc.data(); // Return the data of the updated document
-    } else {
-      console.log("No such document!");
-      return null; // Return null if the document does not exist
-    }
-  }
-
-  /**
    * Marks a survey as canceled if the specified selection matches a "cancel" value.
    * @param {Object} params - Parameters for survey cancellation.
    * @param {string} params.flowId - Flow ID.

@@ -1,8 +1,6 @@
 const { runStepBasedFlow2 } = require("../flows/samples/runStepBasedFlow2");
 const {
-  runEditDetailsFlow,
   runEnhamComboFlow,
-  runOnboardingFlow,
   runSignpostingFlow,
   runStepBasedFlow,
   runSurveyFlow,
@@ -67,25 +65,13 @@ async function flowController(req, res, next) {
     };
     //determine function to run based on request params, each function uses the `flowConstructorParams` to initialize the relevant Flow service/handler class
     //To-DO add guard clause to check is flow enabled for organization
-    if (flow === "onboarding") {
-      flowCompletionStatus = await runOnboardingFlow({
-        flowStep,
-        flowConstructorParams,
-      });
-    } else if (flow === "signposting") {
+    if (flow === "signposting") {
       const userSelection = req.body.userSelection;
       flowCompletionStatus = await runSignpostingFlow({
         db,
         flowConstructorParams,
         flowStep,
         userSelection,
-      });
-    } else if (flow === "edit-details") {
-      const userDetailUpdate = req.body?.userDetailUpdate;
-      flowCompletionStatus = await runEditDetailsFlow({
-        flowConstructorParams,
-        flowStep,
-        userDetailUpdate,
       });
     } else if (flow === "survey") {
       flowCompletionStatus = await runSurveyFlow({
