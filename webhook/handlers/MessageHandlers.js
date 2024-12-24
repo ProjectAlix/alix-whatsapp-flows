@@ -53,20 +53,10 @@ class InboundMessageHandler extends BaseMessageHandler {
   async handle() {
     try {
       // get organization from database by phone number to save the inbound message with its ID
-      const organization = await this.databaseService.getOrganization(
-        this.organizationPhoneNumber
-      );
+      const organization = await this.getUserOrganization();
       // get the contact information from the database (if the user has messaged the number previously their details will have been stored)
-      const registeredUser = await this.databaseService.getUser(
-        this.body.WaId,
-        this.organizationPhoneNumber,
-        this.body.ProfileName
-      );
-      const userInfo = registeredUser || {
-        //extract user information to be used in the flows later and sent to the Flows microservice
-        "WaId": this.body.WaId,
-        "ProfileName": this.body.ProfileName,
-      };
+
+      const userInfo = await this.getUserInfo();
       //Adding additional properties to the inbound message to be stored in the database
       const messageToSave = {
         OrganizationId: organization?._id || null,
@@ -77,11 +67,7 @@ class InboundMessageHandler extends BaseMessageHandler {
       };
       //Pre-configured opt-out & opt-in messages, functionality is mostly handled by Twilio, but we update the user information by default as well
       if (this.body.Body === "OPT-OUT" || this.body.Body === "OPT-IN") {
-        await this.databaseService.updateUser(
-          this.body.WaId,
-          this.organizationPhoneNumber,
-          { "opted_in": this.body.Body === "OPT-OUT" ? false : true }
-        );
+        await this.handleOptOutOptIn();
         return this.res.status(204).send();
       }
       //check if the text of the first message is a preconfigured "trigger" message for a flow to start
@@ -102,16 +88,9 @@ class InboundMessageHandler extends BaseMessageHandler {
       }
     } catch (err) {
       console.error(err);
-      await this.flowManagerService.deleteFlowOnErr({
-        userId: this.body.WaId,
-        err,
-      });
+      await this.handleFlowError(err);
       this.res.status(500).send(err);
     }
-  }
-
-  isSampleTrigger() {
-    return this.body.Body.toLowerCase().split("-")[0] === "sample";
   }
 
   /**

@@ -48,6 +48,37 @@ class BaseMessageHandler {
     this.buttonPayload = this.body?.ButtonPayload ?? "";
     this.isReminder = isReminder;
   }
+
+  async getUserOrganization() {
+    return this.databaseService.getOrganization(this.organizationPhoneNumber);
+  }
+  async getUserInfo() {
+    const registeredUser = await this.databaseService.getUser(
+      this.body.WaId,
+      this.organizationPhoneNumber,
+      this.body.ProfileName
+    );
+    const userInfo = registeredUser || {
+      //extract user information to be used in the flows later and sent to the Flows microservice
+      "WaId": this.body.WaId,
+      "ProfileName": this.body.ProfileName,
+    };
+    return userInfo;
+  }
+  async handleOptOutOptIn() {
+    await this.databaseService.updateUser(
+      this.body.WaId,
+      this.organizationPhoneNumber,
+      { "opted_in": this.body.Body === "OPT-IN" }
+    );
+  }
+  async handleFlowError(err) {
+    console.error(err);
+    await this.flowManagerService.deleteFlowOnErr({
+      userId: this.body.WaId,
+      err,
+    });
+  }
   /**
    * Creates message data to be sent based on the user and flow information.
    * @param {Object} params - Parameters for creating message data.
