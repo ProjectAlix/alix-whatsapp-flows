@@ -287,7 +287,7 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
           EnhamPA_registrationComplete: false,
           EnhamPA_profile: {},
         };
-        await this.contactModel.updateContact(this.WaId, newRegistrationDoc);
+        await this.updateUser(newRegistrationDoc);
       }
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_pa_register_intro",
@@ -317,7 +317,7 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
           ),
           EnhamPA_lastDetailCheckDate: null,
         };
-        await this.contactModel.updateContact(this.WaId, updateDoc);
+        await this.updateUser(updateDoc);
       }
       const {
         responseContent,
@@ -330,12 +330,12 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
         const updateDoc = {
           [profileUpdateConfig.updateKey]: this.messageContent,
         };
-        await this.contactModel.updateContactNestedField(
-          this.WaId,
+        const updateData = {
           updatePath,
           updateDoc,
-          profileUpdateConfig.updateKey
-        );
+          updateKey: profileUpdateConfig.updateKey,
+        };
+        await this.updateUser(updateData, true);
       }
       if (responseType === "text") {
         const message = createTextMessage({

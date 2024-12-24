@@ -42,11 +42,27 @@ class BaseFlow {
 
   /**
    * Updates user information using the contact model.
+   *
    * @async
-   * @param {Object} updateData - Data to update for the user.
-   * @returns {Promise<void>}
+   * @param {Object} updateData - The data to update for the user.
+   * @param {boolean} [isNestedFieldUpdate=false] - Flag indicating if the update targets a nested field.
+   * @param {string} [updateData.updatePath] - The path of the nested field to update (required if `isNestedFieldUpdate` is true).
+   * @param {Object} [updateData.updateDoc] - The document containing the update data for the nested field (required if `isNestedFieldUpdate` is true).
+   * @param {string} [updateData.updateKey] - A key to identify the nested field update (optional, used if `isNestedFieldUpdate` is true).
+   * @returns {Promise<void>} - Resolves when the update operation completes.
+   * @throws {Error} - Throws an error if the update operation fails.
    */
-  async updateUser(updateData) {
+  async updateUser(updateData, isNestedFieldUpdate = false) {
+    if (isNestedFieldUpdate) {
+      const { updatePath, updateDoc, updateKey } = updateData;
+      await this.contactModel.updateContactNestedField(
+        this.WaId,
+        updatePath,
+        updateDoc,
+        updateKey
+      );
+      return;
+    }
     await this.contactModel.updateContact(this.WaId, updateData);
   }
 

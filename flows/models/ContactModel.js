@@ -76,7 +76,7 @@ class ContactModel {
       console.log(err);
     }
   }
-  async updateContactNestedField(recipient, updatePath, updateData, updateKey) {
+  async updateContactNestedField(recipient, updatePath, updateDoc, updateKey) {
     try {
       const contactOrganization = await this.organizationsCollection.findOne({
         organizationPhoneNumber: this.organizationPhoneNumber,
@@ -86,19 +86,14 @@ class ContactModel {
       const updateOperation = {
         $set: {},
       };
-
-      // Check if the nested field already exists, and set it accordingly
       if (
-        updateData &&
-        Object.prototype.hasOwnProperty.call(updateData, updateKey)
+        updateDoc &&
+        Object.prototype.hasOwnProperty.call(updateDoc, updateKey)
       ) {
-        // Field exists, update it directly
-        updateOperation.$set[updatePath] = updateData[updateKey];
+        updateOperation.$set[updatePath] = updateDoc[updateKey];
       } else {
-        // Field doesn't exist, create it
-        updateOperation.$set[updatePath] = updateData;
+        updateOperation.$set[updatePath] = updateDoc;
       }
-      // Update the nested field in the contacts collection
       await this.contactsCollection.findOneAndUpdate(
         { WaId: recipient, organizationId: contactOrganizationId },
         updateOperation,
