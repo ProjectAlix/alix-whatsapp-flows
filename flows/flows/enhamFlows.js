@@ -7,6 +7,7 @@ const {
   enhamPayrollQuizConfig,
   enhamDemoConfig,
   enhamPARegistrationConfig,
+  enhamPADetailCheckConfig,
 } = require("../config/flowResponses.config");
 class EnhamComboFlow extends BaseFlow {
   static FLOW_NAME = "enham-quiz-shelter-moneyhelper";
@@ -377,13 +378,63 @@ class EnhamDetailCheckFlow extends BaseFlow {
   }
   async handleFlowStep(flowStep, flowSection) {
     let flowCompletionStatus = false;
+    //TO-DO handle case when user not have PA Profile
     if (flowStep === 1 && flowSection === 1) {
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_availability_check_intro",
         templateVariables: {
-          templateVariables: this.userInfo.ProfileName,
+          username: this.userInfo.ProfileName,
+          availability_days_times: "demo availability",
+          availability_considerations: "demo note",
         },
       });
+    } else if (flowStep === 1 && flowSection === 3) {
+      //maybe get prev section and if its 2 update the user?
+      await this.saveAndSendTemplateMessage({
+        templateKey: "enham_postcode_check",
+        templateVariables: {
+          postcode: "ive not figured this out yet",
+        },
+      });
+    } else {
+      const config = enhamPADetailCheckConfig[flowSection]?.[flowStep];
+      if (!config) {
+        return flowCompletionStatus;
+      }
+      const {
+        responseContent,
+        responseType,
+        templateKey,
+        profileUpdateConfig,
+      } = config;
+      if (profileUpdateConfig.updateUserProfile) {
+        const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
+        const updateDoc = {
+          [profileUpdateConfig.updateKey]: this.messageContent,
+        };
+        const updateData = {
+          updatePath,
+          updateDoc,
+          updateKey: profileUpdateConfig.updateKey,
+        };
+        await this.updateUser(updateData, true);
+      }
+      if (responseType === "text") {
+        const message = createTextMessage({
+          waId: this.WaId,
+          textContent: responseContent,
+          messagingServiceSid: this.messagingServiceSid,
+        });
+        await this.saveAndSendTextMessage(
+          message,
+          EnhamPARegisterFlow.FLOW_NAME
+        );
+      } else if (responseType === "template") {
+        await this.saveAndSendTemplateMessage({
+          templateKey,
+          templateVariables: responseContent,
+        });
+      }
     }
     return flowCompletionStatus;
   }

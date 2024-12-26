@@ -4,18 +4,6 @@ const { FieldValue } = require("firebase-admin/firestore");
  * Service for managing user flow interactions in Firestore, creates new flows, manages existing ones and adding additional information based off button selection.
  */
 class FlowManagerService {
-  /**
-   * @static
-   * @type {Array<string>}
-   * @description Predefined messages when a user wants to update more details in edit-details flow
-   */
-  static ADD_UPDATE_MESSAGES = ["Yes", "No thanks"];
-  /**
-   * @static
-   * @type {string}
-   * @description A predefined message identifier that is used to cancel a survey.
-   * This can be triggered by the user when they wish to stop or cancel the ongoing survey flow.
-   */
   static SURVEY_CANCELLATION_MESSAGE = "cancel-survey";
   /**
    * @static
@@ -23,12 +11,19 @@ class FlowManagerService {
    * @description A predefined message identifier that signifies the user intends to move to the next section
    * of the flow. This is used to check if the flow should advance to the next part.
    */
-  static NEXT_SECTION_MESSAGE = "next_section";
+  static FM_SURVEY_NEXT_SECTION_MESSAGE = "next_section";
   /**
    * @static
    * @type {Object}
    * @description Predefined message identifiers for setting up a search in signposting flow.
+   *
    */
+  static SOCIAL_SURVEY_PATH_CONFIG = {
+    "graduation-event": 3,
+    "end-of-year-social&&graduation-event": 3,
+    "end-of-year-social": 6,
+    "!end-of-year-social&&!graduation-event": 10,
+  };
   static SIGNPOSTING_CATEGORY_SELECTION_NAMES = {
     2: "category",
     3: "location",
@@ -50,30 +45,17 @@ class FlowManagerService {
    * @type {Object}
    * @description Predefined configuration for conducting a user detail update.
    */
-
-  static ENHAM_START_OVER_MESSAGE = "startover-enham_qa";
-  static ENHAM_QUIZ_END_MESSAGE = "ask_questions-startover";
-  /**
-   * @static
-   * @type {Object}
-   * @description Predefined configuration for conducting a user detail update.
-   */
-  static USER_UPDATE_QUERY_FIELDS = {
-    1: "detailField",
-    2: "detailValue",
-  };
-
-  static SOCIAL_SURVEY_PATH_CONFIG = {
-    "graduation-event": 3,
-    "end-of-year-social&&graduation-event": 3,
-    "end-of-year-social": 6,
-    "!end-of-year-social&&!graduation-event": 10,
-  };
   static ENHAM_SERVICE_OPTIONS = [
     "ask_questions",
     "training_and_quizzes",
     "documents_sign",
   ];
+  static ENHAM_START_OVER_MESSAGE = "startover-enham_qa";
+  static ENHAM_QUIZ_END_MESSAGE = "ask_questions-startover";
+  static ENHAM_AVAILABILITY_CHANGE_MESSAGES = {
+    "yes-availability_change": 1,
+    "no-availability_change": 2,
+  };
   /**
    * @static
    * @description Checks whether the conditions are met for moving to the next section in the flow.
@@ -96,7 +78,7 @@ class FlowManagerService {
     if (data.flowName === "survey") {
       if (
         buttonPayload.split("-")[1] ===
-          FlowManagerService.NEXT_SECTION_MESSAGE ||
+          FlowManagerService.FM_SURVEY_NEXT_SECTION_MESSAGE ||
         (data.flowSection == 2 && data.flowStep == 5) ||
         (data.flowSection == 3 && data.flowStep == 5) ||
         (data.flowSection == 4 && data.flowStep == 3) ||
@@ -133,8 +115,21 @@ class FlowManagerService {
       ) {
         return NEXT_SECTION;
       }
+    } else if (data.flowName === "enham-pa-detail-check") {
+      console.log("CURRENT STUFF", data.flowSection, data.flowStep);
+      if (
+        Object.keys(
+          FlowManagerService.ENHAM_AVAILABILITY_CHANGE_MESSAGES
+        ).includes(buttonPayload)
+      ) {
+        return FlowManagerService.ENHAM_AVAILABILITY_CHANGE_MESSAGES[
+          buttonPayload
+        ];
+      }
+      if (data.flowSection === 2 && data.flowStep === 3) {
+        return NEXT_SECTION;
+      }
     }
-
     return null;
   }
 

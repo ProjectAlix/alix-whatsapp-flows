@@ -908,10 +908,33 @@ const enhamPARegistrationConfig = {
     },
   },
 };
+const enhamPADetailCheckConfig = {
+  2: {
+    //section 2 will handle user availability update
+    1: {
+      responseType: "text",
+      responseContent:
+        "Ok sure - please answer the availability question again: \n\n🕐 Please choose all of the below days and times you can work. If you have any further availability notes you can state in the next question. Please choose as many options as make sense, and write eg '1, 2, 4'\n\n1. Weekdays\n2. Weekends\n3. Mornings (6am - 11am)\n4. Afternoons (11am - 4pm)\n5. Evenings (4pm - 8pm)\n6. Nights (8pm - midnight)\n7. Overnight\n8. Bank holidays",
+      profileUpdateConfig: {
+        updateUserProfile: false,
+      },
+    },
+    2: {
+      responseType: "text",
+      responseContent:
+        "Thank you - 📝 Please state if there is anything else we need to know about your availability.\n\nPlease answer in one message only.",
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "availability_days_times",
+      },
+    },
+  },
+};
 module.exports = {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
   enhamPayrollQuizConfig,
   enhamDemoConfig,
   enhamPARegistrationConfig,
+  enhamPADetailCheckConfig,
 };

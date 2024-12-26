@@ -270,6 +270,14 @@ class InboundMessageHandler extends BaseMessageHandler {
       flowName: "enham-pa-register",
     });
   }
+
+  async startEnhamDetailCheckFlow(userInfo, messageToSave) {
+    await this.startFlow({
+      userInfo,
+      messageToSave,
+      flowName: "enham-pa-detail-check",
+    });
+  }
   /**
    *
    * Handles an existing flow for the user based on their current flow status.
@@ -412,6 +420,15 @@ class InboundMessageHandler extends BaseMessageHandler {
           questionNumber,
         });
       }
+    } else if (flowName === "enham-pa-detail-check") {
+      const { flowSection, flowStep } =
+        //TO-DO can probs simplify this
+        await this.flowManagerService.createNextSectionUpdate({
+          WaId: this.body.WaId,
+          buttonPayload: this.buttonPayload,
+        });
+      messageData.flowSection = flowSection;
+      messageData.flowStep = flowStep;
     }
     await this.processFlowResponse({
       flowName,
