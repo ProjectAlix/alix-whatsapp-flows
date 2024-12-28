@@ -55,6 +55,9 @@ class FlowManagerService {
   static ENHAM_AVAILABILITY_CHANGE_MESSAGES = {
     "yes-availability_change": 1,
     "no-availability_change": 2,
+    "no-postcode_change": 1,
+    "no-distance_change": 1,
+    "no-extra_update": 1,
   };
   /**
    * @static
@@ -126,7 +129,12 @@ class FlowManagerService {
           buttonPayload
         ];
       }
-      if (data.flowSection === 2 && data.flowStep === 3) {
+      if (
+        (data.flowSection === 2 && data.flowStep === 3) ||
+        (data.flowSection === 3 && data.flowStep === 3) ||
+        (data.flowSection === 4 && data.flowStep === 3) ||
+        (data.flowSection === 5 && data.flowStep === 3)
+      ) {
         return NEXT_SECTION;
       }
     }

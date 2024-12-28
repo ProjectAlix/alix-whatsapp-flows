@@ -378,6 +378,13 @@ class EnhamDetailCheckFlow extends BaseFlow {
   }
   async handleFlowStep(flowStep, flowSection) {
     let flowCompletionStatus = false;
+    const config = enhamPADetailCheckConfig[flowSection]?.[flowStep] || {};
+    const {
+      responseContent = null,
+      responseType = "text",
+      templateKey = "",
+      profileUpdateConfig = {},
+    } = config;
     //TO-DO handle case when user not have PA Profile
     if (flowStep === 1 && flowSection === 1) {
       await this.saveAndSendTemplateMessage({
@@ -388,38 +395,44 @@ class EnhamDetailCheckFlow extends BaseFlow {
           availability_considerations: "demo note",
         },
       });
-    } else if (flowStep === 1 && flowSection === 3) {
+    } else if (flowSection === 3 && flowStep === 1) {
       //maybe get prev section and if its 2 update the user?
+
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_postcode_check",
         templateVariables: {
           postcode: "ive not figured this out yet",
         },
       });
+      //ask for the update here dum dum
+    } else if (flowSection === 4 && flowStep === 1) {
+      await this.saveAndSendTemplateMessage({
+        templateKey: "enham_distance_check",
+        templateVariables: {
+          max_travel_distance: "ive not figured this out yet either",
+        },
+      });
+    } else if (flowSection === 5 && flowStep === 1) {
+      await this.saveAndSendTemplateMessage({
+        templateKey: "enham_extra_update",
+        templateVariables: {
+          templateVariables:
+            "Ok thanks for confirming 😊\n\nIs there anything else we should know which might be a new update?",
+        },
+      });
+    } else if (flowSection === 6 && flowStep === 1) {
+      await this.saveAndSendTemplateMessage({
+        templateKey: "enham_detail_check_end",
+        templateVariables: {
+          templateVariables:
+            "Ok great. Thanks for your help in keeping us up-to-date 😊\n\nWould you like us to check-in on your details again in 1 month, or in 3 months? ",
+        },
+      });
     } else {
-      const config = enhamPADetailCheckConfig[flowSection]?.[flowStep];
       if (!config) {
         return flowCompletionStatus;
       }
-      const {
-        responseContent,
-        responseType,
-        templateKey,
-        profileUpdateConfig,
-      } = config;
-      if (profileUpdateConfig.updateUserProfile) {
-        const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
-        const updateDoc = {
-          [profileUpdateConfig.updateKey]: this.messageContent,
-        };
-        const updateData = {
-          updatePath,
-          updateDoc,
-          updateKey: profileUpdateConfig.updateKey,
-        };
-        await this.updateUser(updateData, true);
-      }
-      if (responseType === "text") {
+      if (responseType === "text" && responseContent) {
         const message = createTextMessage({
           waId: this.WaId,
           textContent: responseContent,
@@ -435,6 +448,27 @@ class EnhamDetailCheckFlow extends BaseFlow {
           templateVariables: responseContent,
         });
       }
+    }
+    console.log("BUTTON PAYLOAD", this.buttonPayload);
+    if (
+      profileUpdateConfig.updateUserProfile &&
+      this.buttonPayload !== "default-next_section" &&
+      this.buttonPayload !== "no-availability_change" &&
+      this.buttonPayload !== "no-postcode_change" &&
+      this.buttonPayload !== "no-distance_change" &&
+      this.buttonPayload !== "no-extra_update"
+    ) {
+      const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
+      const updateDoc = {
+        [profileUpdateConfig.updateKey]: this.messageContent,
+      };
+      const updateData = {
+        updatePath,
+        updateDoc,
+        updateKey: profileUpdateConfig.updateKey,
+      };
+      console.log("user will be updated with", updateData);
+      // await this.updateUser(updateData, true);
     }
     return flowCompletionStatus;
   }

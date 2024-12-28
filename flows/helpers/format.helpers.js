@@ -28,9 +28,17 @@ function formatButtonId(buttonPayload) {
     flowStep: splitId[1],
   };
 }
+function matchMonthlyButtonText(messageContent) {
+  const buttonTextMap = {
+    "1 month please": "Monthly basis",
+    "3 months please": "Quarterly basis",
+  };
+  return buttonTextMap[messageContent];
+}
 module.exports = {
   formatTag,
   convertTemplateName,
   formatContact,
   formatButtonId,
+  matchMonthlyButtonText,
 };

@@ -1,3 +1,5 @@
+const { response } = require("express");
+
 const fatMacysSurveyConfig1 = {
   1: {
     2: {
@@ -920,12 +922,84 @@ const enhamPADetailCheckConfig = {
       },
     },
     2: {
-      responseType: "text",
-      responseContent:
-        "Thank you - 📝 Please state if there is anything else we need to know about your availability.\n\nPlease answer in one message only.",
+      responseType: "template", //change to template
+      responseContent: {
+        templateVariables:
+          "Thank you - 📝 Please state if there is anything else we need to know about your availability.\n\nPlease answer in one message only.\n\nIf not, please press 'Next'",
+      },
+      templateKey: "default_next_section",
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "availability_days_times",
+      },
+    },
+  },
+  3: {
+    1: {
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "availability_considerations",
+      },
+    },
+    2: {
+      responseType: "text",
+      responseContent:
+        "Ok sure - please state your new postcode.\n\nPlease answer in one message only",
+      //previous message will be either note to availability or null
+      profileUpdateConfig: {
+        updateUserProfile: false,
+      },
+    },
+  },
+  4: {
+    1: {
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "postcode",
+      },
+    },
+    2: {
+      responseType: "text",
+      responseContent:
+        "Ok sure - please answer the maximum travel distance question again:\n\n 🚗 How far are you willing to travel from your postcode. Please choose from the options below:\n\n1. Within 0 - 2 miles\n2. Upto 2 - 5 miles\n3. Upto 5 - 15 miles\n4. 15 + miles",
+      //previous message will be either note to postcode or null
+      profileUpdateConfig: {
+        updateUserProfile: false,
+      },
+    },
+  },
+  5: {
+    1: {
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "max_travel_distance",
+      },
+    },
+    2: {
+      responseType: "text",
+      responseContent:
+        "Ok sure - please state your other updates ✍️. \n\nPlease answer in one message only.",
+      //previous message will be  distance update
+      profileUpdateConfig: {
+        updateUserProfile: false,
+      },
+    },
+  },
+  6: {
+    1: {
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "notes",
+      },
+    },
+    2: {
+      responseType: "text",
+      responseContent:
+        "Ok sure - I’ll check-in then ☺️ \n\nHave a lovely rest of your day ☀️",
+      //previous message will be  distance update
+      profileUpdateConfig: {
+        updateUserProfile: true,
+        updateKey: "availability_check_frequency",
       },
     },
   },
