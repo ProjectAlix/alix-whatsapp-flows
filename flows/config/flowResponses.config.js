@@ -996,7 +996,6 @@ const enhamPADetailCheckConfig = {
       responseType: "text",
       responseContent:
         "Ok sure - I’ll check-in then ☺️ \n\nHave a lovely rest of your day ☀️",
-      //previous message will be  distance update
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "availability_check_frequency",

@@ -2,6 +2,7 @@ const {
   createTextMessage,
   delayMessage,
 } = require("../helpers/messages.helpers");
+const { matchButtonTextToStoredValue } = require("../helpers/format.helpers");
 const { BaseFlow, SurveyBaseFlow } = require("./BaseFlow");
 const {
   enhamPayrollQuizConfig,
@@ -360,6 +361,8 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
 }
 
 class EnhamDetailCheckFlow extends BaseFlow {
+  static DETAIL_CHECK_COMPLETION_SECTION = 6;
+  static DETAIL_CHECK_COMPLETION_STEP = 2;
   static FLOW_NAME = "enham-pa-detail-check";
   constructor({
     userInfo,
@@ -386,6 +389,14 @@ class EnhamDetailCheckFlow extends BaseFlow {
       profileUpdateConfig = {},
     } = config;
     //TO-DO handle case when user not have PA Profile
+    if (
+      flowStep === EnhamDetailCheckFlow.DETAIL_CHECK_COMPLETION_STEP &&
+      flowSection === EnhamDetailCheckFlow.DETAIL_CHECK_COMPLETION_SECTION
+    ) {
+      console.log("should execute");
+      flowCompletionStatus = true;
+      await this.updateUser({ "EnhamPA_lastDetailCheckDate": new Date() });
+    }
     if (flowStep === 1 && flowSection === 1) {
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_availability_check_intro",
@@ -396,8 +407,6 @@ class EnhamDetailCheckFlow extends BaseFlow {
         },
       });
     } else if (flowSection === 3 && flowStep === 1) {
-      //maybe get prev section and if its 2 update the user?
-
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_postcode_check",
         templateVariables: {
@@ -459,8 +468,26 @@ class EnhamDetailCheckFlow extends BaseFlow {
       this.buttonPayload !== "no-extra_update"
     ) {
       const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
+      const parsedMessageContent = matchButtonTextToStoredValue(
+        this.messageContent
+      );
+      if (
+        profileUpdateConfig.updateKey === "availability_check_frequency" &&
+        parsedMessageContent !==
+          this.userInfo.EnhamPA_profile.availability_check_frequency
+      ) {
+        const newNextDetailCheckDate = new Date();
+        const daysToAdd =
+          EnhamPARegisterFlow.DAYS_UNTIL_REMINDER[parsedMessageContent];
+        newNextDetailCheckDate.setDate(
+          newNextDetailCheckDate.getDate() + daysToAdd
+        );
+        await this.updateUser({
+          "EnhamPA_nextDetailCheckDate": newNextDetailCheckDate,
+        });
+      }
       const updateDoc = {
-        [profileUpdateConfig.updateKey]: this.messageContent,
+        [profileUpdateConfig.updateKey]: parsedMessageContent,
       };
       const updateData = {
         updatePath,
@@ -468,7 +495,7 @@ class EnhamDetailCheckFlow extends BaseFlow {
         updateKey: profileUpdateConfig.updateKey,
       };
       console.log("user will be updated with", updateData);
-      // await this.updateUser(updateData, true);
+      await this.updateUser(updateData, true);
     }
     return flowCompletionStatus;
   }
