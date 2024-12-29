@@ -405,15 +405,17 @@ class EnhamDetailCheckFlow extends BaseFlow {
         templateKey: "enham_availability_check_intro",
         templateVariables: {
           username: this.userInfo.ProfileName,
-          availability_days_times: "demo availability",
-          availability_considerations: "demo note",
+          availability_days_times:
+            this.userInfo.EnhamPA_profile.availability_days_times.value,
+          availability_considerations:
+            this.userInfo.EnhamPA_profile.availability_considerations.value,
         },
       });
     } else if (flowSection === 3 && flowStep === 1) {
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_postcode_check",
         templateVariables: {
-          postcode: "ive not figured this out yet",
+          postcode: this.userInfo.EnhamPA_profile.postcode.value,
         },
       });
       //ask for the update here dum dum
@@ -421,7 +423,8 @@ class EnhamDetailCheckFlow extends BaseFlow {
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_distance_check",
         templateVariables: {
-          max_travel_distance: "ive not figured this out yet either",
+          max_travel_distance:
+            this.userInfo.EnhamPA_profile.max_travel_distance.value,
         },
       });
     } else if (flowSection === 5 && flowStep === 1) {
