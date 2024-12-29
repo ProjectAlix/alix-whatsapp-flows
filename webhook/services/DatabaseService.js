@@ -66,8 +66,7 @@ class DatabaseService {
   async getScheduledContacts(flowName, currentDateTime, organizationId) {
     //TO-DO: test this
     console.log(flowName);
-    const { schedules, prefix, topLevelFlag, scheduleFrequencyFieldPath } =
-      nextReminderUpdateConfig[flowName];
+    const { prefix, topLevelFlag } = nextReminderUpdateConfig[flowName];
     const flow = await this.availableFlowsCollection.findOne({
       "flowName": flowName,
     });
@@ -103,39 +102,7 @@ class DatabaseService {
         },
       ])
       .toArray();
-    const bulkOps = scheduledContacts
-      .map((contact) => {
-        const frequency = getNestedField(contact, scheduleFrequencyFieldPath);
-        const daysToAdd = schedules[frequency];
-        if (!daysToAdd) {
-          console.warn(`No configuration found for frequency: ${frequency}`);
-          return null;
-        }
 
-        const nextReminderDate = new Date(
-          new Date(contact[`${prefix}_nextDetailCheckDate`]).getTime() +
-            daysToAdd * 24 * 60 * 60 * 1000
-        );
-
-        return {
-          updateOne: {
-            filter: { _id: contact._id },
-            update: {
-              $set: {
-                [`${prefix}_nextDetailCheckDate`]: nextReminderDate,
-                [`${prefix}_lastDetailCheckDate`]: currentDateTime,
-              },
-            },
-          },
-        };
-      })
-      .filter(Boolean);
-
-    if (bulkOps.length > 0) {
-      await this.contactCollection.bulkWrite(bulkOps);
-    }
-
-    console.log(scheduledContacts);
     return {
       flow,
       contactList: scheduledContacts,

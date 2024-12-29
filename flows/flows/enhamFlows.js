@@ -330,7 +330,10 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
       if (profileUpdateConfig.updateUserProfile) {
         const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
         const updateDoc = {
-          [profileUpdateConfig.updateKey]: this.messageContent,
+          [profileUpdateConfig.updateKey]: {
+            value: this.messageContent,
+            originalMessageSid: this.userMessage.MessageSid,
+          },
         };
         const updateData = {
           updatePath,
@@ -471,11 +474,8 @@ class EnhamDetailCheckFlow extends BaseFlow {
       const parsedMessageContent = matchButtonTextToStoredValue(
         this.messageContent
       );
-      if (
-        profileUpdateConfig.updateKey === "availability_check_frequency" &&
-        parsedMessageContent !==
-          this.userInfo.EnhamPA_profile.availability_check_frequency
-      ) {
+
+      if (profileUpdateConfig.updateKey === "availability_check_frequency") {
         const newNextDetailCheckDate = new Date();
         const daysToAdd =
           EnhamPARegisterFlow.DAYS_UNTIL_REMINDER[parsedMessageContent];
@@ -487,8 +487,12 @@ class EnhamDetailCheckFlow extends BaseFlow {
         });
       }
       const updateDoc = {
-        [profileUpdateConfig.updateKey]: parsedMessageContent,
+        [profileUpdateConfig.updateKey]: {
+          value: this.messageContent,
+          originalMessageSid: this.userMessage.MessageSid,
+        },
       };
+
       const updateData = {
         updatePath,
         updateDoc,

@@ -26,6 +26,7 @@ class BaseMessageHandler {
   static INITIAL_QUESTION_DICT = {
     "enham-pa-register": enhamPARegisterConfig,
   };
+
   constructor({
     req,
     res,

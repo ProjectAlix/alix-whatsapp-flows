@@ -51,7 +51,6 @@ def create_transcription(
         # Generate transcription and GCS URI using the transcription service
         transcription, gcs_uri=speech_to_text_service.handle_transcription(media_url)
         print(gcs_uri)
-        # Update survey response record in the database with message transcription
         db_service.update_message_text(message_sid, transcription, gcs_uri)
         return {"message": f"Message updated successfully with {transcription}", "status": 200}
     except errors.PyMongoError as db_error: 

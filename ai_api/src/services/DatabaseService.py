@@ -20,6 +20,7 @@ class DatabaseService:
     def update_message_text(self, message_sid, transcription, gcs_uri):
         message_collection=self.db["messages"]
         flow_history_collection=self.db["flow_history"]
+        contacts_collection=self.db["contacts"]
         try:
            message_collection.update_one({"MessageSid": message_sid}, {"$set": {"Body": transcription, "gcsAudioUri": gcs_uri} } )
            flow_history_collection.update_one(         {
@@ -34,6 +35,30 @@ class DatabaseService:
                 }
             })
            print(f"Message {message_sid} body updated to {transcription}")
+           contact = contacts_collection.find_one({
+            "$expr": {
+                "$anyElementTrue": {
+                    "$map": {
+                        "input": {"$objectToArray": "$EnhamPA_profile"},
+                        "as": "field",
+                        "in": {
+                            "$eq": ["$$field.v.originalMessageSid", message_sid]
+                        }
+                    }
+                }
+            }
+        })
+           if contact:
+                    print("Contact found for message SID:", contact)
+                    for field, data in contact.get("EnhamPA_profile", {}).items():
+                        if data.get("originalMessageSid") == message_sid:
+                            update_path = f"EnhamPA_profile.{field}.value"
+                            contacts_collection.update_one(
+                                    {"_id": contact["_id"]},
+                                    {"$set": {update_path: transcription}}
+                                )
+                            print(f"Updated field '{field}' with value: {transcription}")
+                            break    
         except errors.PyMongoError as e: 
             print(f"Error in update operation: {e}")
 
