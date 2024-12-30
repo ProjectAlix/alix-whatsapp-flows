@@ -20,6 +20,7 @@ twilio = "^9.3.2"
 google-cloud-speech = "^2.27.0"
 google-cloud-storage = "^2.18.2"
 openai = "^1.55.3"
+pytest = "^8.3.4"
 
 
 [build-system]

@@ -36,18 +36,50 @@ class DatabaseService:
             })
            print(f"Message {message_sid} body updated to {transcription}")
            contact = contacts_collection.find_one({
+    "$or": [
+        {
+            # Case: The field is an array
             "$expr": {
                 "$anyElementTrue": {
                     "$map": {
                         "input": {"$objectToArray": "$EnhamPA_profile"},
                         "as": "field",
                         "in": {
-                            "$eq": ["$$field.v.originalMessageSid", message_sid]
+                            "$cond": [
+                                {"$isArray": "$$field.v"},
+                                {"$anyElementTrue": {
+                                    "$map": {
+                                        "input": "$$field.v",
+                                        "as": "item",
+                                        "in": {"$eq": ["$$item.originalMessageSid", message_sid]}
+                                    }
+                                }},
+                                False
+                            ]
                         }
                     }
                 }
             }
-        })
+        },
+        {
+            # Case: The field is an object
+            "$expr": {
+                "$anyElementTrue": {
+                    "$map": {
+                        "input": {"$objectToArray": "$EnhamPA_profile"},
+                        "as": "field",
+                        "in": {
+                            "$and": [
+                                {"$isArray": "$$field.v"},
+                                {"$eq": ["$$field.v.originalMessageSid", message_sid]}
+                            ]
+                        }
+                    }
+                }
+            }
+        }
+    ]
+})
            if contact:
             print("Contact found for message SID:", contact)
 
