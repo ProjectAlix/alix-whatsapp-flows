@@ -329,11 +329,23 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
       } = config;
       if (profileUpdateConfig.updateUserProfile) {
         const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
-        const updateDoc = {
-          [profileUpdateConfig.updateKey]: {
+        const updateValue = {
+          "object": {
             value: this.messageContent,
             originalMessageSid: this.userMessage.MessageSid,
+            lastUpdatedAt: new Date(),
           },
+          "array": [
+            {
+              value: this.messageContent,
+              originalMessageSid: this.userMessage.MessageSid,
+              createdAt: new Date(),
+            },
+          ],
+        };
+        const updateDoc = {
+          [profileUpdateConfig.updateKey]:
+            updateValue[profileUpdateConfig.fieldType],
         };
         const updateData = {
           updatePath,
@@ -367,6 +379,13 @@ class EnhamDetailCheckFlow extends BaseFlow {
   static DETAIL_CHECK_COMPLETION_SECTION = 6;
   static DETAIL_CHECK_COMPLETION_STEP = 2;
   static FLOW_NAME = "enham-pa-detail-check";
+  static NO_UPDATE_BUTTON_PAYLOAD = [
+    "default-next_section",
+    "no-availability_change",
+    "no-postcode_change",
+    "no-distance_change",
+    "no-extra_update",
+  ];
   constructor({
     userInfo,
     userMessage,
@@ -391,12 +410,19 @@ class EnhamDetailCheckFlow extends BaseFlow {
       templateKey = "",
       profileUpdateConfig = {},
     } = config;
-    //TO-DO handle case when user not have PA Profile
+    if (!this.userInfo.EnhamPA_profile) {
+      return flowCompletionStatus;
+    }
+    const {
+      availability_days_times,
+      availability_considerations,
+      postcode,
+      max_travel_distance,
+    } = this.userInfo.EnhamPA_profile;
     if (
       flowStep === EnhamDetailCheckFlow.DETAIL_CHECK_COMPLETION_STEP &&
       flowSection === EnhamDetailCheckFlow.DETAIL_CHECK_COMPLETION_SECTION
     ) {
-      console.log("should execute");
       flowCompletionStatus = true;
       await this.updateUser({ "EnhamPA_lastDetailCheckDate": new Date() });
     }
@@ -405,17 +431,15 @@ class EnhamDetailCheckFlow extends BaseFlow {
         templateKey: "enham_availability_check_intro",
         templateVariables: {
           username: this.userInfo.ProfileName,
-          availability_days_times:
-            this.userInfo.EnhamPA_profile.availability_days_times.value,
-          availability_considerations:
-            this.userInfo.EnhamPA_profile.availability_considerations.value,
+          availability_days_times: availability_days_times.value,
+          availability_considerations: availability_considerations.value,
         },
       });
     } else if (flowSection === 3 && flowStep === 1) {
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_postcode_check",
         templateVariables: {
-          postcode: this.userInfo.EnhamPA_profile.postcode.value,
+          postcode: postcode.value,
         },
       });
       //ask for the update here dum dum
@@ -423,8 +447,7 @@ class EnhamDetailCheckFlow extends BaseFlow {
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_distance_check",
         templateVariables: {
-          max_travel_distance:
-            this.userInfo.EnhamPA_profile.max_travel_distance.value,
+          max_travel_distance: max_travel_distance.value,
         },
       });
     } else if (flowSection === 5 && flowStep === 1) {
@@ -464,14 +487,11 @@ class EnhamDetailCheckFlow extends BaseFlow {
         });
       }
     }
-    console.log("BUTTON PAYLOAD", this.buttonPayload);
     if (
       profileUpdateConfig.updateUserProfile &&
-      this.buttonPayload !== "default-next_section" &&
-      this.buttonPayload !== "no-availability_change" &&
-      this.buttonPayload !== "no-postcode_change" &&
-      this.buttonPayload !== "no-distance_change" &&
-      this.buttonPayload !== "no-extra_update"
+      !EnhamDetailCheckFlow.NO_UPDATE_BUTTON_PAYLOAD.includes(
+        this.buttonPayload
+      )
     ) {
       const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
       const parsedMessageContent = matchButtonTextToStoredValue(
@@ -495,13 +515,12 @@ class EnhamDetailCheckFlow extends BaseFlow {
           originalMessageSid: this.userMessage.MessageSid,
         },
       };
-
       const updateData = {
         updatePath,
         updateDoc,
         updateKey: profileUpdateConfig.updateKey,
       };
-      console.log("user will be updated with", updateData);
+
       await this.updateUser(updateData, true);
     }
     return flowCompletionStatus;

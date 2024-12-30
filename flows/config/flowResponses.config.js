@@ -719,6 +719,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "username",
+        fieldType: "object",
       },
     },
     3: {
@@ -728,6 +729,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "alt_phone_number",
+        fieldType: "object",
       },
     },
     4: {
@@ -737,6 +739,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "email_address",
+        fieldType: "object",
       },
     },
     5: {
@@ -747,6 +750,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "postcode",
+        fieldType: "object",
       },
     },
   },
@@ -760,6 +764,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "max_travel_distance",
+        fieldType: "object",
       },
     },
   },
@@ -772,6 +777,7 @@ const enhamPARegistrationConfig = {
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
+        fieldType: "object",
         updateKey: "dbs",
       },
     },
@@ -784,6 +790,7 @@ const enhamPARegistrationConfig = {
         "👩‍🏫 Please could you share some details of any qualifications you may have eg NVQs or Care certificates. Qualifications aren't necessary, but feel free to share anything which might be relevant. You can text or record a voicenote if you'd like. Please share this in one message, you can always add further details at the end.",
       templateKey: null,
       profileUpdateConfig: {
+        fieldType: "object",
         updateUserProfile: true,
         updateKey: "relevant_experience",
       },
@@ -794,6 +801,7 @@ const enhamPARegistrationConfig = {
         "🗣️ Please could you share if you speak any other languages fluently aside from English (eg Polish 🇵🇱, Welsh 🏴󠁧󠁢󠁷󠁬󠁳󠁿, Gujarati , Urdu 🇵🇰, Hindi 🇮🇳, Bengali 🇧🇩, Arabic, Ukrainien 🇺🇦, Punjabi 🇮🇳, Amharic 🇪🇹)",
       templateKey: null,
       profileUpdateConfig: {
+        fieldType: "object",
         updateUserProfile: true,
         updateKey: "qualifications",
       },
@@ -806,6 +814,7 @@ const enhamPARegistrationConfig = {
         "🕐 Please choose all of the below days and times you can work. If you have any further availability notes you can state in the next question. Please choose as many options as make sense, and write eg '1, 2, 4'\n\n1. Weekdays\n2. Weekends\n3. Mornings (6am - 11am)\n4. Afternoons (11am - 4pm)\n5. Evenings (4pm - 8pm)\n6. Nights (8pm - midnight)\n7. Overnight\n8. Bank holidays",
       templateKey: null,
       profileUpdateConfig: {
+        fieldType: "object",
         updateUserProfile: true,
         updateKey: "languages",
       },
@@ -816,6 +825,7 @@ const enhamPARegistrationConfig = {
         "📝 Please state if there is anything else we need to know about your availability ",
       templateKey: null,
       profileUpdateConfig: {
+        fieldType: "object",
         updateUserProfile: true,
         updateKey: "availability_days_times",
       },
@@ -827,6 +837,7 @@ const enhamPARegistrationConfig = {
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
+        fieldType: "array",
         updateKey: "availability_considerations",
       },
     },
@@ -838,6 +849,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "work_flexibility",
+        fieldType: "object",
       },
     },
     5: {
@@ -847,6 +859,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "work_type_preferences",
+        fieldType: "object",
       },
     },
   },
@@ -861,6 +874,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "transport_preferences",
+        fieldType: "object",
       },
     },
   },
@@ -875,6 +889,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "references",
+        fieldType: "object",
       },
     },
   },
@@ -886,6 +901,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "availability_check_frequency",
+        fieldType: "object",
       },
     },
     2: {
@@ -894,7 +910,8 @@ const enhamPARegistrationConfig = {
         "🙋‍♀️ If you have any further questions about the PA register process, please let us know here and a member of the team will aim to get back to you within a 2 week time period",
       profileUpdateConfig: {
         updateUserProfile: true,
-        updateKey: "additional_info",
+        updateKey: "notes",
+        fieldType: "array",
       },
     },
   },
@@ -906,6 +923,7 @@ const enhamPARegistrationConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "further_questions",
+        fieldType: "object",
       },
     },
   },
@@ -931,6 +949,7 @@ const enhamPADetailCheckConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "availability_days_times",
+        fieldType: "object",
       },
     },
   },
@@ -939,6 +958,7 @@ const enhamPADetailCheckConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "availability_considerations",
+        fieldType: "array",
       },
     },
     2: {
@@ -956,6 +976,7 @@ const enhamPADetailCheckConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "postcode",
+        fieldType: "object",
       },
     },
     2: {
@@ -973,6 +994,7 @@ const enhamPADetailCheckConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "max_travel_distance",
+        fieldType: "object",
       },
     },
     2: {
@@ -990,6 +1012,7 @@ const enhamPADetailCheckConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "notes",
+        fieldType: "array",
       },
     },
     2: {
@@ -999,6 +1022,7 @@ const enhamPADetailCheckConfig = {
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "availability_check_frequency",
+        fieldType: "object",
       },
     },
   },
