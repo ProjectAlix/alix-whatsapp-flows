@@ -97,7 +97,7 @@ class BaseMessageHandler {
     if (!initialQuestion) return {};
     const { questionContent, questionNumber } = initialQuestion;
     return {
-      surveyResponses: [
+      flowResponses: [
         {
           questionContent,
           questionNumber,

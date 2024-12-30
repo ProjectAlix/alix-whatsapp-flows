@@ -427,7 +427,7 @@ class DatabaseService {
       { "trackedFlowId": flowId },
       {
         $push: {
-          surveyResponses: { ...update, CreatedAt: new Date() },
+          flowResponses: { ...update, CreatedAt: new Date() },
         },
       }
     );
@@ -443,7 +443,7 @@ class DatabaseService {
     const flow = await this.sentFlowsCollection.findOne({
       "trackedFlowId": flowId,
     });
-    const existingSurveyData = flow?.surveyResponses;
+    const existingSurveyData = flow?.flowResponses;
     if (!existingSurveyData || existingSurveyData.length === 0) {
       return;
     }
@@ -453,12 +453,12 @@ class DatabaseService {
     await this.sentFlowsCollection.updateOne(
       {
         "trackedFlowId": flowId,
-        "surveyResponses.CreatedAt": latestQuestion.CreatedAt,
+        "flowResponses.CreatedAt": latestQuestion.CreatedAt,
       },
       {
         $set: {
-          "surveyResponses.$.userResponse": userResponse,
-          "surveyResponses.$.originalMessageSid": messageSid, // Add the userResponse property to the latest survey response
+          "flowResponses.$.userResponse": userResponse,
+          "flowResponses.$.originalMessageSid": messageSid, // Add the userResponse property to the latest survey response
         },
       }
     );
