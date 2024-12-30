@@ -82,22 +82,29 @@ class ContactModel {
         organizationPhoneNumber: this.organizationPhoneNumber,
       });
       const contactOrganizationId = contactOrganization._id;
-
-      const updateOperation = {
-        $set: {},
-      };
-      if (
-        updateDoc &&
-        Object.prototype.hasOwnProperty.call(updateDoc, updateKey)
-      ) {
-        updateOperation.$set[updatePath] = updateDoc[updateKey];
+      let updateOperation;
+      const isArrayField = Array.isArray(updateDoc[updateKey]);
+      console.log("UPDATE DOC IS HERE", updateDoc);
+      console.log("is it an array", isArrayField, updateDoc[updateKey]);
+      if (isArrayField) {
+        updateOperation = {
+          $push: {
+            [updatePath]: { $each: updateDoc[updateKey] },
+          },
+        };
       } else {
-        updateOperation.$set[updatePath] = updateDoc;
+        // Use $set for non-array fields
+        updateOperation = {
+          $set: {
+            [updatePath]: updateDoc[updateKey] ?? updateDoc,
+          },
+        };
       }
+
       await this.contactsCollection.findOneAndUpdate(
         { WaId: recipient, organizationId: contactOrganizationId },
         updateOperation,
-        { upsert: true }
+        { upsert: true } // Create the document if it doesn't exist
       );
     } catch (err) {
       console.error("Error updating nested field:", err);

@@ -432,7 +432,7 @@ class EnhamDetailCheckFlow extends BaseFlow {
         templateVariables: {
           username: this.userInfo.ProfileName,
           availability_days_times: availability_days_times.value,
-          availability_considerations: availability_considerations.value,
+          availability_considerations: availability_considerations[0].value, //TO-DO check if this is acc the latest one
         },
       });
     } else if (flowSection === 3 && flowStep === 1) {
@@ -509,12 +509,25 @@ class EnhamDetailCheckFlow extends BaseFlow {
           "EnhamPA_nextDetailCheckDate": newNextDetailCheckDate,
         });
       }
-      const updateDoc = {
-        [profileUpdateConfig.updateKey]: {
+      const updateValue = {
+        "object": {
           value: this.messageContent,
           originalMessageSid: this.userMessage.MessageSid,
+          lastUpdatedAt: new Date(),
         },
+        "array": [
+          {
+            value: this.messageContent,
+            originalMessageSid: this.userMessage.MessageSid,
+            createdAt: new Date(),
+          },
+        ],
       };
+      const updateDoc = {
+        [profileUpdateConfig.updateKey]:
+          updateValue[profileUpdateConfig.fieldType],
+      };
+
       const updateData = {
         updatePath,
         updateDoc,
