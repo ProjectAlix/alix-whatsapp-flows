@@ -35,6 +35,7 @@ class DatabaseService:
                 }
             })
            print(f"Message {message_sid} body updated to {transcription}")
+           #TO-DO make this dynamic
            contact = contacts_collection.find_one({
     "$or": [
         {

@@ -501,7 +501,7 @@ class EnhamDetailCheckFlow extends BaseFlow {
       if (profileUpdateConfig.updateKey === "availability_check_frequency") {
         const newNextDetailCheckDate = new Date();
         const daysToAdd =
-          EnhamPARegisterFlow.DAYS_UNTIL_REMINDER[parsedMessageContent];
+          EnhamPARegisterFlow.DAYS_UNTIL_REMINDER[parsedMessageContent]; //TO-DO update this later to use flow info directly
         newNextDetailCheckDate.setDate(
           newNextDetailCheckDate.getDate() + daysToAdd
         );
@@ -511,13 +511,13 @@ class EnhamDetailCheckFlow extends BaseFlow {
       }
       const updateValue = {
         "object": {
-          value: this.messageContent,
+          value: parsedMessageContent,
           originalMessageSid: this.userMessage.MessageSid,
           lastUpdatedAt: new Date(),
         },
         "array": [
           {
-            value: this.messageContent,
+            value: parsedMessageContent,
             originalMessageSid: this.userMessage.MessageSid,
             createdAt: new Date(),
           },
