@@ -713,6 +713,14 @@ const enhamPARegistrationConfig = {
   //the update needs to happen on the property that was before what is being asked about now
   1: {
     2: {
+      responseContent: "🙋‍♀️ Please enter your first and last name ",
+      responseType: "text",
+      templateKey: null,
+      profileUpdateConfig: {
+        updateUserProfile: false,
+      },
+    },
+    3: {
       responseContent: "☎️ Please enter your phone number",
       responseType: "text",
       templateKey: null,
@@ -722,7 +730,7 @@ const enhamPARegistrationConfig = {
         fieldType: "object",
       },
     },
-    3: {
+    4: {
       responseContent: "📧 Please enter your email address",
       responseType: "text",
       templateKey: null,
@@ -732,7 +740,7 @@ const enhamPARegistrationConfig = {
         fieldType: "object",
       },
     },
-    4: {
+    5: {
       responseType: "text",
       responseContent: "📮 Please enter your postcode",
       templateKey: null,
@@ -742,10 +750,10 @@ const enhamPARegistrationConfig = {
         fieldType: "object",
       },
     },
-    5: {
+    6: {
       responseType: "text",
       responseContent:
-        "🚗 How far are you willing to travel from your postcode. Please choose from the options below:\n\n1. Within 0 - 2 miles\n2. Upto 2 - 5 miles\n3. Upto 5 - 15 miles\n4. 15 + miles",
+        "🚗 How far would you be willing to travel up to? Please indicate your answer with the relevant number below: \n\n1. Within 0 - 2 miles\n2. Upto 2 - 5 miles\n3. Upto 5 - 15 miles\n4. 15 + miles",
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
@@ -758,7 +766,8 @@ const enhamPARegistrationConfig = {
     1: {
       responseType: "template",
       responseContent: {
-        templateVariables: "✅ Please say if you have a portable DBS",
+        templateVariables:
+          "✅ Please say if you have a portable DBS.\n\nPlease note having one isn't necessary at this stage, but it is helpful to know if you already have one in place. ",
       },
       templateKey: "default_yn",
       profileUpdateConfig: {
@@ -773,7 +782,7 @@ const enhamPARegistrationConfig = {
     1: {
       responseType: "text",
       responseContent:
-        "🥰 Please could you share some details of your previous care related experience, such as who you have worked with. This could be formal or informal (eg if looked after family members) - this could be any reason you are interested in care. You can text or record a voicenote if you'd like. Please share this in one message, you can always add further details at the end.",
+        "🥰 Please could you share some details (a couple of sentences) of your previous care related experience, examples could include, supporting a family member, working in a paid role, supporting someone with autism, learning or physical disabilities etc.\n\nYou can text or record a voicenote if you'd like. Please share this in one message, you can always add further details at the end",
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
@@ -787,7 +796,7 @@ const enhamPARegistrationConfig = {
     1: {
       responseType: "text",
       responseContent:
-        "👩‍🏫 Please could you share some details of any qualifications you may have eg NVQs or Care certificates. Qualifications aren't necessary, but feel free to share anything which might be relevant. You can text or record a voicenote if you'd like. Please share this in one message, you can always add further details at the end.",
+        "👩‍🏫 Please could you share some details of any qualifications you may have eg NVQs or Care certificates. Qualifications aren't necessary, but feel free to share anything which might be relevant.\n\nYou can text or record a voicenote if you'd like. Please share this in one message, you can always add further details at the end.",
       templateKey: null,
       profileUpdateConfig: {
         fieldType: "object",
@@ -798,8 +807,7 @@ const enhamPARegistrationConfig = {
     2: {
       responseType: "text",
       responseContent:
-        "🗣️ Please could you share if you speak any other languages fluently aside from English (eg Polish 🇵🇱, Welsh 🏴󠁧󠁢󠁷󠁬󠁳󠁿, Gujarati , Urdu 🇵🇰, Hindi 🇮🇳, Bengali 🇧🇩, Arabic, Ukrainien 🇺🇦, Punjabi 🇮🇳, Amharic 🇪🇹)",
-      templateKey: null,
+        "🗣️ Please could you share if you speak any other languages fluently aside from English (eg Polish 🇵🇱, Welsh 🏴󠁧󠁢󠁷󠁬󠁳󠁿, Gujarati , Urdu 🇵🇰, Hindi 🇮🇳, Bengali 🇧🇩, Arabic, Ukrainien 🇺🇦, Punjabi 🇮🇳, Amharic 🇪🇹), British Sign Language, Makaton.\n\nPlease write n/a if not applicable.",
       profileUpdateConfig: {
         fieldType: "object",
         updateUserProfile: true,
@@ -822,7 +830,7 @@ const enhamPARegistrationConfig = {
     2: {
       responseType: "text",
       responseContent:
-        "📝 Please state if there is anything else we need to know about your availability ",
+        "📝 Please state if there is anything else we need to know about your availability",
       templateKey: null,
       profileUpdateConfig: {
         fieldType: "object",
@@ -833,7 +841,7 @@ const enhamPARegistrationConfig = {
     3: {
       responseType: "text",
       responseContent:
-        "👍 Please choose all of the below areas you would be willing to consider. \n\n1. Travel (eg accompany someone on a trip for multiple days)\n2. Short shifts (less than 3 hours)",
+        "👍 Please choose all of the below areas you would be willing to consider.\n\n1. Supporting someone on holiday abroad.\n2. Supporting someone on holiday in the UK",
       templateKey: null,
       profileUpdateConfig: {
         updateUserProfile: true,
@@ -855,7 +863,7 @@ const enhamPARegistrationConfig = {
     5: {
       responseType: "text",
       responseContent:
-        "🎡 Please state which of the following transport you are happy to engage with. Please choose as many options as make sense, and write eg \"1, 2, 4\"\n\n1. Driving someone in your car (you'd need business insurance in order to do this)\n2. Accompanying someone on public transport\n3. Driving someone else's car (they'd have the insurance in place for this)\n4. Happy to use your car for work related tasks (eg collecting shopping)",
+        "🎡 Please state which of the following transport you are happy to engage with. Please choose as many options as make sense, and write eg \"1, 2, 3\" \n\n1. Accompanying someone on public transport\n2. Driving someone else's car (they'd have the insurance in place for this)\n3. Happy to use your car for work related tasks (you'd need business insurance in order to do this)",
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "work_type_preferences",
@@ -869,7 +877,7 @@ const enhamPARegistrationConfig = {
       templateKey: "default_yn",
       responseContent: {
         templateVariables:
-          "👯‍♀️ Please confirm that a potential employer may be able to contact a reference if needed",
+          "Thanks for all your answers so far! You are almost finished 🥰\n\n🧑 Please confirm that a potential employer may be able to contact a reference if needed",
       },
       profileUpdateConfig: {
         updateUserProfile: true,
@@ -883,7 +891,7 @@ const enhamPARegistrationConfig = {
       responseType: "template",
       responseContent: {
         templateVariables:
-          "👋 Please confirm on what basis you are happy for us to message you again over WhatsApp, to check your availability & other details are up to date",
+          "👋 Please confirm on what basis you are happy for us to message you again over WhatsApp, to check your availability & other details are up to date ",
       },
       templateKey: "enham_pa_scheduling",
       profileUpdateConfig: {
@@ -895,9 +903,12 @@ const enhamPARegistrationConfig = {
   },
   8: {
     1: {
-      responseType: "text",
-      responseContent:
-        "➕ If there is anything else you would like to add, such as any other information / or a photo / a CV etc - please send us this now and we will add as a note ☺️",
+      responseType: "template",
+      responseContent: {
+        templateVariables:
+          '➕ If there is anything else you would like to add, such as any other information / or a photo / a CV etc - please send us this now and we will add as a note ☺️\n\nIf there is nothing to add, please select "Next" below',
+      },
+      templateKey: "default_next_section",
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "availability_check_frequency",
@@ -905,9 +916,12 @@ const enhamPARegistrationConfig = {
       },
     },
     2: {
-      responseType: "text",
-      responseContent:
-        "🙋‍♀️ If you have any further questions about the PA register process, please let us know here and a member of the team will aim to get back to you within a 2 week time period",
+      responseType: "template",
+      responseContent: {
+        templateVariables:
+          '🙋‍♀️ If you have any further questions about the PA register process, please let us know here and a member of the team will aim to get back to you within a 2 week time period\n\nIf there are no questions, please select "Next" below',
+      },
+      templateKey: "default_next_section",
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "notes",
@@ -917,9 +931,6 @@ const enhamPARegistrationConfig = {
   },
   9: {
     1: {
-      responseType: "text",
-      responseContent:
-        "🙌 Thanks for filling in the details - you are now registered! We will be in touch as suitable opportunities arise 🥰",
       profileUpdateConfig: {
         updateUserProfile: true,
         updateKey: "further_questions",

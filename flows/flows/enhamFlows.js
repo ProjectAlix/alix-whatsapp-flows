@@ -294,16 +294,41 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
       await this.saveAndSendTemplateMessage({
         templateKey: "enham_pa_register_intro",
       });
+    } else if (
+      flowStep === EnhamPARegisterFlow.LAST_STEP &&
+      flowSection === EnhamPARegisterFlow.LAST_SECTION
+    ) {
+      await this.saveAndSendTemplateMessage({
+        templateKey: "enham_pa_register_end",
+        templateVariables: {
+          username:
+            this.userInfo?.EnhamPA_profile?.username?.value ||
+            this.userInfo.ProfileName,
+        },
+      });
+      const updatePath = `EnhamPA_profile.further_questions`;
+      const messageValue =
+        this.messageContent === "Next" ? null : this.messageContent;
+      const updateDoc = {
+        "further_questions": [
+          {
+            value: messageValue,
+            originalMessageSid: this.userMessage.MessageSid,
+            createdAt: new Date(),
+          },
+        ],
+      };
+      const updateData = {
+        updatePath,
+        updateDoc,
+        updateKey: "further_questions",
+      };
+      await this.updateUser(updateData, true);
+      flowCompletionStatus = true;
     } else {
       const config = enhamPARegistrationConfig[flowSection]?.[flowStep];
       if (!config) {
         return flowCompletionStatus;
-      }
-      if (
-        flowStep === EnhamPARegisterFlow.LAST_STEP &&
-        flowSection === EnhamPARegisterFlow.LAST_SECTION
-      ) {
-        flowCompletionStatus = true;
       }
       if (
         flowStep === EnhamPARegisterFlow.REGISTRATION_COMPLETION_STEP &&
@@ -329,15 +354,17 @@ class EnhamPARegisterFlow extends SurveyBaseFlow {
       } = config;
       if (profileUpdateConfig.updateUserProfile) {
         const updatePath = `EnhamPA_profile.${profileUpdateConfig.updateKey}`;
+        const messageValue =
+          this.messageContent === "Next" ? null : this.messageContent;
         const updateValue = {
           "object": {
-            value: this.messageContent,
+            value: messageValue,
             originalMessageSid: this.userMessage.MessageSid,
             lastUpdatedAt: new Date(),
           },
           "array": [
             {
-              value: this.messageContent,
+              value: messageValue,
               originalMessageSid: this.userMessage.MessageSid,
               createdAt: new Date(),
             },
