@@ -6,7 +6,29 @@ const { formatTag } = require("../helpers/format.helpers");
 const { sendMessage } = require("../helpers/twilio.helpers");
 const { findTemplateSid } = require("../helpers/twilio_account.helpers");
 const { BaseFlow } = require("./BaseFlow");
-
+class SignpostingV2Flow extends BaseFlow {
+  static FLOW_NAME = "signposting";
+  constructor({
+    userInfo,
+    userMessage,
+    contactModel,
+    organizationPhoneNumber,
+    organizationMessagingServiceSid,
+  }) {
+    super({
+      userInfo,
+      userMessage,
+      contactModel,
+      organizationPhoneNumber,
+      organizationMessagingServiceSid,
+    });
+  }
+  async handleFlowStep(flowStep, flowSection) {
+    console.log("ok we r here", flowStep, flowSection, this.userMessage);
+    const flowCompletionStatus = true;
+    return flowCompletionStatus;
+  }
+}
 class SignpostingFlow extends BaseFlow {
   static FLOW_NAME = "signposting";
   constructor({
@@ -28,6 +50,7 @@ class SignpostingFlow extends BaseFlow {
   async init() {
     try {
       const template1 = await findTemplateSid("signposting_options_1", false);
+      console.log("Template 1", template1);
       this.signpostingTemplates[1] = {
         templateSid: template1?.templateSid,
         templateName: template1?.templateName,
@@ -243,4 +266,5 @@ class SignpostingFlow extends BaseFlow {
 
 module.exports = {
   SignpostingFlow,
+  SignpostingV2Flow,
 };

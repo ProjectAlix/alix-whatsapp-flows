@@ -3,7 +3,7 @@ const { SurveyBaseFlow } = require("./BaseFlow");
 const {
   fatMacysSurveyConfig1,
   fatMacysSurveyConfig2,
-} = require("../config/flowResponses.config");
+} = require("../config/flowResponses/fm.config");
 class FatMacysSurveyFlow extends SurveyBaseFlow {
   static FLOW_NAME = "survey";
   static LAST_SECTION = 7;

@@ -5,6 +5,7 @@ const {
   EnhamDetailCheckFlow,
 } = require("../flows/enhamFlows");
 const { SignpostingFlow } = require("../flows/alixFlows");
+const { GoldingSignpostingFlow } = require("../flows/goldingFlows");
 const { FMSocialSurveyFlow, FatMacysSurveyFlow } = require("../flows/fmFlows");
 const { StepBasedFlow } = require("../flows/samples/StepBasedFlow");
 const { SupportOptionService } = require("../services/dn/SupportOptionService");
@@ -232,6 +233,31 @@ async function runSignpostingFlow({
   return flowCompletionStatus;
 }
 
+async function runGoldingSignpostingFlow({
+  flowConstructorParams,
+  flowStep,
+  flowSection,
+}) {
+  const {
+    userInfo,
+    userMessage,
+    contactModel,
+    organizationPhoneNumber,
+    organizationMessagingServiceSid,
+  } = flowConstructorParams;
+  const signpostingV2Flow = new GoldingSignpostingFlow({
+    userInfo,
+    userMessage,
+    contactModel,
+    organizationPhoneNumber,
+    organizationMessagingServiceSid,
+  });
+  const flowCompletionStatus = await signpostingV2Flow.handleFlowStep(
+    flowStep,
+    flowSection
+  );
+  return flowCompletionStatus;
+}
 /**
  * Executes a sample step-based flow.
  *
@@ -263,6 +289,7 @@ async function runStepBasedFlow({ flowConstructorParams, flowStep }) {
 module.exports = {
   runEnhamComboFlow,
   runSignpostingFlow,
+  runGoldingSignpostingFlow,
   runStepBasedFlow,
   runSurveyFlow,
   runFMSocialSurveyFlow,

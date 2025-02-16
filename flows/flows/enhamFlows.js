@@ -9,7 +9,7 @@ const {
   enhamDemoConfig,
   enhamPARegistrationConfig,
   enhamPADetailCheckConfig,
-} = require("../config/flowResponses.config");
+} = require("../config/flowResponses/enham.config");
 class EnhamComboFlow extends BaseFlow {
   static FLOW_NAME = "enham-quiz-shelter-moneyhelper";
   static SERVICE_OPTIONS = [

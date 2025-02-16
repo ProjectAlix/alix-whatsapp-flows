@@ -2,6 +2,7 @@ const { runStepBasedFlow2 } = require("../flows/samples/runStepBasedFlow2");
 const {
   runEnhamComboFlow,
   runSignpostingFlow,
+  runGoldingSignpostingFlow,
   runStepBasedFlow,
   runSurveyFlow,
   runFMSocialSurveyFlow,
@@ -123,6 +124,12 @@ async function flowController(req, res, next) {
       });
     } else if (flow === "enham-pa-detail-check") {
       flowCompletionStatus = await runEnhamDetailCheckFlow({
+        flowConstructorParams,
+        flowStep,
+        flowSection,
+      });
+    } else if (flow === "signposting-golding") {
+      flowCompletionStatus = await runGoldingSignpostingFlow({
         flowConstructorParams,
         flowStep,
         flowSection,

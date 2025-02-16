@@ -1,5 +1,5 @@
 [tool.poetry]
-name = "server"
+name = "ai_api"
 version = "0.1.0"
 description = ""
 authors = ["daria425 <darianaumova5@gmail.com>"]

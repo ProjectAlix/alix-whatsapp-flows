@@ -278,22 +278,14 @@ class InboundMessageHandler extends BaseMessageHandler {
       flowName: "enham-pa-detail-check",
     });
   }
-  /**
-   *
-   * Handles an existing flow for the user based on their current flow status.
-   * This method retrieves the user's current flow and advances the flow step
-   * based on user input or "See More Options" conditions (signposting specific).
-   * @param {Object} userInfo - The user's data.
-   * @param {Object} messageToSave - Message data to be saved.
-   * Calls:
-   *  - `getCurrentFlow`: retrieves the flow that the user is currently in from Firestore object
-   *  - `createMessageData`: @see {@link createMessageData}
-   *  - `databaseService.updateFlowStatus`: updates the flow status to "in_progress", if a flow already exists for the user that means that
-   * the message recieved from the Twilio API is a response to an outbound message sent.
-   *  - `processFlowResponse`: @see {@link processFlowResponse}
-   *  -
-   * @returns {Promise<void>}
-   */
+
+  async startGoldingSignpostingFlow(userInfo, messageToSave) {
+    await this.startFlow({
+      userInfo,
+      messageToSave,
+      flowName: "signposting-golding",
+    });
+  }
   async handleExistingFlow(userInfo, messageToSave) {
     //retrieve current flow from Firestore
     const currentFlow = await this.flowManagerService.getCurrentFlow(

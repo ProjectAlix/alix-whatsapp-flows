@@ -8,15 +8,23 @@ async function listTemplates() {
     password: authToken,
   };
 
-  const response = await axios.get("https://content.twilio.com/v1/Content", {
-    auth,
-  });
+  const response = await axios.get(
+    "https://content.twilio.com/v1/Content?PageSize=100",
+    {
+      auth,
+    }
+  );
   return response.data;
 }
 
 async function findTemplateSid(templateName, convertTemplate = true) {
   try {
     const templates = await listTemplates();
+    console.log(
+      templates.contents.find(
+        (tmpl) => tmpl.friendly_name == "signposting_options_1"
+      )
+    );
     const searchableTemplateName = convertTemplate
       ? convertTemplateName(templateName)
       : templateName;
