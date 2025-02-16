@@ -25,8 +25,8 @@ class FlowManagerService {
     "!end-of-year-social&&!graduation-event": 10,
   };
   static SIGNPOSTING_CATEGORY_SELECTION_NAMES = {
-    2: "category",
-    3: "location",
+    3: "category",
+    4: "location",
   };
 
   /**
@@ -166,7 +166,6 @@ class FlowManagerService {
       const startTime = new Date().toISOString();
       const { flowName, userInfo, flowStep, userMessage, flowSection } =
         messageData;
-      console.log("firestore recieved", messageData);
       const userId = userInfo.WaId;
       const existingFlowSnapshot = await this.db
         .collection("flows")
@@ -297,9 +296,10 @@ class FlowManagerService {
    * @see {@link ../handlers/MessageHandlers.js~InboundMessageHandler#updateUserSignpostingSelection}
    */
   async updateUserSelection({ flowId, flowStep, selectionValue }) {
+    console.log("SELECTION VALUE!", selectionValue);
     const selectionNames = {
-      2: "category",
-      3: "location",
+      3: "category",
+      4: "location",
     };
     const flowRef = this.db.collection("flows").doc(flowId);
     const runNextStep =

@@ -58,7 +58,6 @@ class DatabaseService {
         { "WaId": WaId, "organizationId": contactOrganizationId },
         { "$set": updateDoc }
       );
-      console.log("found contact!!!!!!!", contact);
     } catch (err) {
       console.log(err);
     }
@@ -273,10 +272,6 @@ class DatabaseService {
         ...message,
         ContactId: contact._id,
       });
-      console.log("the saved message looks like", {
-        ...message,
-        ContactId: contact._id,
-      });
     } catch (err) {
       console.error(err);
       throw err;
@@ -330,7 +325,6 @@ class DatabaseService {
         return;
       }
       const contact = await this.getUser(WaId, organizationPhoneNumber);
-      console.log(contact);
       const newFlowDoc = {
         CreatedAt: new Date(),
         flowName: flowName,
