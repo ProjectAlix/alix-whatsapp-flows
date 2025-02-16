@@ -343,12 +343,11 @@ class FlowManagerService {
     const flowRef = this.db.collection("flows").doc(flowId);
     console.log("the current flow step in update is", flowStep);
     if (flowSection === 1) {
-      if (flowStep === 1) {
+      if (flowStep === 2) {
         await flowRef.update({
+          "userSelection.category_1": selectionValue,
           "userSelection.page": 1,
         });
-      } else if (flowStep === 2) {
-        await flowRef.update({ "userSelection.category_1": selectionValue });
       } else if (flowStep === 3) {
         await flowRef.update({
           "userSelection.category_2": selectionValue,

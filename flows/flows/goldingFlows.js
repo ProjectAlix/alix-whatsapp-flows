@@ -21,7 +21,12 @@ class GoldingSignpostingFlow extends BaseFlow {
       organizationMessagingServiceSid,
     });
   }
-  async handleFlowStep(flowStep, flowSection) {
+  async handleFlowStep({
+    flowStep,
+    flowSection,
+    userSelection,
+    signpostingService,
+  }) {
     console.log("ok we r here", flowStep, flowSection, this.messageContent);
     let flowCompletionStatus = false;
     if (flowSection === 1 && flowStep === 2) {
@@ -41,6 +46,14 @@ ${messageItem.messageText}
         message,
         GoldingSignpostingFlow.FLOW_NAME
       );
+    } else if (flowSection === 1 && flowStep === 4) {
+      const { page, category_1, category_2, location } = userSelection;
+      await signpostingService.selectOptions({
+        category1Value: category_1,
+        category2Value: category_2,
+        location,
+        page,
+      });
     } else {
       const config = goldingSignpostingConfig[flowSection]?.[flowStep];
       if (!config) {

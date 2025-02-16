@@ -116,10 +116,13 @@ async function flowController(req, res, next) {
         flowSection,
       });
     } else if (flow === "signposting-golding") {
+      const userSelection = req.body.userSelection;
       flowCompletionStatus = await runGoldingSignpostingFlow({
+        db: controlRoomDb,
         flowConstructorParams,
         flowStep,
         flowSection,
+        userSelection,
       });
     }
     res.status(200).send({ flowCompletionStatus });

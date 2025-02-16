@@ -10,6 +10,7 @@ const { FMSocialSurveyFlow, FatMacysSurveyFlow } = require("../flows/fmFlows");
 const { SupportOptionService } = require("../services/dn/SupportOptionService");
 const { api_base } = require("../config/llm_api.config");
 const { LLMService } = require("../services/dn/LLMService");
+const { SignpostingService } = require("../services/SignpostingService");
 
 async function runFMSocialSurveyFlow({
   flowConstructorParams,
@@ -233,10 +234,13 @@ async function runSignpostingFlow({
 }
 
 async function runGoldingSignpostingFlow({
+  db,
   flowConstructorParams,
   flowStep,
   flowSection,
+  userSelection,
 }) {
+  const signpostingService = new SignpostingService(db);
   const {
     userInfo,
     userMessage,
@@ -244,17 +248,19 @@ async function runGoldingSignpostingFlow({
     organizationPhoneNumber,
     organizationMessagingServiceSid,
   } = flowConstructorParams;
-  const signpostingV2Flow = new GoldingSignpostingFlow({
+  const goldingSignpostingFlow = new GoldingSignpostingFlow({
     userInfo,
     userMessage,
     contactModel,
     organizationPhoneNumber,
     organizationMessagingServiceSid,
   });
-  const flowCompletionStatus = await signpostingV2Flow.handleFlowStep(
+  const flowCompletionStatus = await goldingSignpostingFlow.handleFlowStep({
     flowStep,
-    flowSection
-  );
+    flowSection,
+    userSelection,
+    signpostingService,
+  });
   return flowCompletionStatus;
 }
 

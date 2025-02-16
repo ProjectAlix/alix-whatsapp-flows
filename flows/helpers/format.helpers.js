@@ -35,10 +35,15 @@ function matchButtonTextToStoredValue(messageContent) {
   };
   return buttonTextMap[messageContent] || messageContent;
 }
+
+const getNumberFromText = (str) =>
+  Number.isNaN(Number.parseInt(str, 10)) ? null : Number.parseInt(str, 10);
+
 module.exports = {
   formatTag,
   convertTemplateName,
   formatContact,
   formatButtonId,
   matchButtonTextToStoredValue,
+  getNumberFromText,
 };
