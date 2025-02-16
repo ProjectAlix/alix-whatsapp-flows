@@ -77,7 +77,7 @@ class FlowManagerService {
   static getSectionUpdate(data, buttonPayload) {
     const NEXT_SECTION = 1;
     const PREV_SECTION = -1;
-    const RESET_STEP = 0;
+    const RESET_SECTION = 0;
     if (data.flowName === "survey") {
       if (
         buttonPayload.split("-")[1] ===
@@ -95,7 +95,7 @@ class FlowManagerService {
         return PREV_SECTION;
       }
       if (buttonPayload === FlowManagerService.ENHAM_QUIZ_END_MESSAGE) {
-        return RESET_STEP;
+        return RESET_SECTION;
       }
       if (data.flowSection === 1 && data.flowStep === 2) {
         return NEXT_SECTION;
@@ -334,6 +334,34 @@ class FlowManagerService {
     }
   }
 
+  async updateSignpostingSelection({
+    flowId,
+    flowSection,
+    flowStep,
+    selectionValue,
+  }) {
+    const flowRef = this.db.collection("flows").doc(flowId);
+    console.log("the current flow step in update is", flowStep);
+    if (flowSection === 1) {
+      if (flowStep === 1) {
+        await flowRef.update({
+          "userSelection.page": 1,
+        });
+      } else if (flowStep === 2) {
+        await flowRef.update({ "userSelection.category_1": selectionValue });
+      } else if (flowStep === 3) {
+        await flowRef.update({
+          "userSelection.category_2": selectionValue,
+        });
+      } else if (flowStep === 4) {
+        await flowRef.update({
+          "userSelection.location": selectionValue,
+        });
+      }
+    }
+    const updatedDoc = await flowRef.get();
+    return updatedDoc.data();
+  }
   /**
    * Marks a survey as canceled if the specified selection matches a "cancel" value.
    * @param {Object} params - Parameters for survey cancellation.
@@ -437,7 +465,6 @@ class FlowManagerService {
 
       let updatedFlowData = { ...flowData };
       //TO-DO clean this ew
-      console.log("current flow step", flowStep);
       if (flowStep === 3) {
         const newStep =
           FlowManagerService.SOCIAL_SURVEY_PATH_CONFIG[userSelection];

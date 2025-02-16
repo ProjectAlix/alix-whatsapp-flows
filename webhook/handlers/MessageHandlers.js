@@ -97,40 +97,9 @@ class InboundMessageHandler extends BaseMessageHandler {
    *
    * @param {Object} params - Parameters for starting the flow.
    * @param {Object} params.userInfo - The user data object.
-   * @param {ObjectId} params.userInfo._id - Unique identifier for the user.
-   * @param {string} params.userInfo.WaId - WhatsApp ID of the user.
-   * @param {string} params.userInfo.username - Username of the user.
-   * @param {string} params.userInfo.ProfileName - Profile name of the user.
-   * @param {ObjectId} params.userInfo.organizationId - Identifier for the user's organization.
-   * @param {Date} params.userInfo.CreatedAt - Timestamp when the user was created.
-   * @param {Date} params.userInfo.LastSeenAt - Timestamp of the user's last activity.
-   * @param {boolean} params.userInfo.isContactable - Whether the user is contactable.
-   * @param {boolean} params.userInfo.isAnon - Indicates if the user is anonymous.
-   * @param {boolean} params.userInfo.reminderSent - Whether a reminder has been sent to the user.
-   *
    * @param {Object} params.messageToSave - The message to be saved in the database.
-   * @param {ObjectId} params.messageToSave.OrganizationId - Identifier for the organization related to the message.
-   * @param {string} params.messageToSave.SmsMessageSid - SMS message SID.
-   * @param {string} params.messageToSave.MessageSid - message SID (same as SMS).
-   * @param {string} params.messageToSave.NumMedia - Number of media attachments.
-   * @param {string} params.messageToSave.ProfileName - Profile name associated with the message.
-   * @param {string} params.messageToSave.MessageType - Type of the message (e.g., "text").
-   * @param {string} params.messageToSave.SmsSid - SMS SID for the message.
-   * @param {string} params.messageToSave.WaId - WhatsApp ID associated with the message.
-   * @param {string} params.messageToSave.SmsStatus - Status of the message (e.g., "received").
-   * @param {string} params.messageToSave.Body - The content of the message.
-   * @param {string} params.messageToSave.To - Recipient's phone number.
-   * @param {string} params.messageToSave.From - Sender's phone number.
-   * @param {Date} params.messageToSave.CreatedAt - Timestamp when the message was created.
-   * @param {string} params.messageToSave.Direction - Direction of the message (e.g., "inbound").
-   * @param {string} params.messageToSave.Status - Status of the message.
-   *
    * @param {string} params.flowName - The name of the flow to start.
-   *
    * @param {Object} [params.extraData] - Additional data to be passed when starting the flow.
-   * @param {Object} params.extraData.userSelection - Data about the user's selection in the flow.
-   * @param {number} params.extraData.userSelection.page - Page number in the flow.
-   * @param {boolean} params.extraData.userSelection.endFlow - Whether the flow should end.
    * @returns {Promise<void>}
    */
   async startFlow({ userInfo, messageToSave, flowName, extraData }) {
@@ -165,7 +134,6 @@ class InboundMessageHandler extends BaseMessageHandler {
     });
 
     //HTTP POST request is made to the Flows API (flows/signposting), containing messageData returned from `createMessageData` in the request body
-    console.log("sent to flows", messageData);
     await this.postRequestService.make_request(
       `flows/${flowName}`,
       messageData
@@ -183,14 +151,6 @@ class InboundMessageHandler extends BaseMessageHandler {
       );
     }
     this.res.status(204).send();
-  }
-
-  async startSampleFlow(userInfo, messageToSave) {
-    const sampleVersion = await this.startFlow({
-      userInfo,
-      messageToSave,
-      flowName: `sample-${sampleVersion}`,
-    });
   }
 
   /**
@@ -263,7 +223,6 @@ class InboundMessageHandler extends BaseMessageHandler {
   }
 
   async startEnhamPARegisterFlow(userInfo, messageToSave) {
-    console.log("message to save here", messageToSave);
     await this.startFlow({
       userInfo,
       messageToSave,
@@ -421,6 +380,19 @@ class InboundMessageHandler extends BaseMessageHandler {
         });
       messageData.flowSection = flowSection;
       messageData.flowStep = flowStep;
+    } else if (flowName === "signposting-golding") {
+      const { flowSection, flowStep } =
+        await this.flowManagerService.createNextSectionUpdate({
+          WaId: this.body.WaId,
+          buttonPayload: this.buttonPayload,
+        });
+      messageData.userSelection = await this.updateSignpostingSelection({
+        flowId,
+        flowSection,
+        flowStep,
+      });
+      messageData.flowSection = flowSection;
+      messageData.flowStep = flowStep;
     }
     await this.processFlowResponse({
       flowName,
@@ -451,6 +423,17 @@ class InboundMessageHandler extends BaseMessageHandler {
     return updatedDoc?.userSelection;
   }
 
+  async updateSignpostingSelection({ flowId, flowSection, flowStep }) {
+    const updatedDoc = await this.flowManagerService.updateSignpostingSelection(
+      {
+        flowId,
+        flowSection,
+        flowStep,
+        selectionValue: this.body.Body,
+      }
+    );
+    return updatedDoc.userSelection;
+  }
   /**
    * Handles survey cancellation based on user input.
    * @param {string} flowId - The unique flow ID.

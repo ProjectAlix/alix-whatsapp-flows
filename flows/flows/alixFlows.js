@@ -50,7 +50,7 @@ class SignpostingFlow extends BaseFlow {
   async init() {
     try {
       const template1 = await findTemplateSid("signposting_options_1", false);
-      console.log("Template 1", template1);
+
       this.signpostingTemplates[1] = {
         templateSid: template1?.templateSid,
         templateName: template1?.templateName,

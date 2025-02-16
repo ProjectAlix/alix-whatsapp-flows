@@ -1,9 +1,7 @@
-const { runStepBasedFlow2 } = require("../flows/samples/runStepBasedFlow2");
 const {
   runEnhamComboFlow,
   runSignpostingFlow,
   runGoldingSignpostingFlow,
-  runStepBasedFlow,
   runSurveyFlow,
   runFMSocialSurveyFlow,
   runEnhamDemoFlow,
@@ -38,7 +36,7 @@ async function flowController(req, res, next) {
       cancelSurvey,
     } = req.body;
     if (process.env.NODE_ENV !== "production") {
-      console.log("req body", req.body);
+      console.log("req bodyyyyyyyy", req.body);
     }
     //get the current flow from request parameters sent from webhook API
     const flow = req.params.flowName;
@@ -80,17 +78,6 @@ async function flowController(req, res, next) {
         flowStep,
         cancelSurvey,
         flowSection,
-      });
-    } else if (flow === "sample-1") {
-      flowCompletionStatus = await runStepBasedFlow({
-        flowConstructorParams,
-        flowStep,
-      });
-    } else if (flow == "sample-2") {
-      flowCompletionStatus = await runStepBasedFlow2({
-        flowConstructorParams,
-        flowStep,
-        flowName: flow,
       });
     } else if (flow === "fm-social-survey") {
       flowCompletionStatus = await runFMSocialSurveyFlow({

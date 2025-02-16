@@ -241,7 +241,6 @@ class DatabaseService {
       const userOrganization = await this.getOrganization(
         organizationPhoneNumber
       );
-      console.log(userOrganization);
       const userOrganizationId = userOrganization._id;
       const user = await this.contactCollection.findOne({
         "WaId": WaId,

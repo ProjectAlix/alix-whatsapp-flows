@@ -7,7 +7,6 @@ const {
 const { SignpostingFlow } = require("../flows/alixFlows");
 const { GoldingSignpostingFlow } = require("../flows/goldingFlows");
 const { FMSocialSurveyFlow, FatMacysSurveyFlow } = require("../flows/fmFlows");
-const { StepBasedFlow } = require("../flows/samples/StepBasedFlow");
 const { SupportOptionService } = require("../services/dn/SupportOptionService");
 const { api_base } = require("../config/llm_api.config");
 const { LLMService } = require("../services/dn/LLMService");
@@ -258,39 +257,11 @@ async function runGoldingSignpostingFlow({
   );
   return flowCompletionStatus;
 }
-/**
- * Executes a sample step-based flow.
- *
- * @async
- * @function
- * @param {Object} params - Parameters for running the step-based flow.
- * @param {Object} params.flowConstructorParams - Common parameters to initialize a flow.
- * @param {Object} params.flowStep - The current step of the flow.
- * @returns {Promise<void>}
- */
-async function runStepBasedFlow({ flowConstructorParams, flowStep }) {
-  const {
-    userInfo,
-    userMessage,
-    contactModel,
-    organizationPhoneNumber,
-    organizationMessagingServiceSid,
-  } = flowConstructorParams;
-  const stepBasedFlow = new StepBasedFlow({
-    userInfo,
-    userMessage,
-    contactModel,
-    organizationPhoneNumber,
-    organizationMessagingServiceSid,
-  });
-  await stepBasedFlow.handleFlowStep(flowStep);
-}
 
 module.exports = {
   runEnhamComboFlow,
   runSignpostingFlow,
   runGoldingSignpostingFlow,
-  runStepBasedFlow,
   runSurveyFlow,
   runFMSocialSurveyFlow,
   runEnhamDemoFlow,

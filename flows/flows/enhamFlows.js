@@ -40,11 +40,6 @@ class EnhamComboFlow extends BaseFlow {
     serviceSelection,
     llmService
   ) {
-    console.log(
-      serviceSelection === EnhamComboFlow.SERVICE_OPTIONS[1],
-      serviceSelection,
-      EnhamComboFlow.SERVICE_OPTIONS
-    );
     let flowCompletionStatus = false;
     if (flowSection === 1) {
       await this.saveAndSendTemplateMessage({
