@@ -48,12 +48,37 @@ ${messageItem.messageText}
       );
     } else if (flowSection === 1 && flowStep === 4) {
       const { page, category_1, category_2, location } = userSelection;
-      await signpostingService.selectOptions({
+      const options = await signpostingService.selectOptions({
         category1Value: category_1,
         category2Value: category_2,
         location,
         page,
       });
+      if (options.length > 0) {
+        const firstText = "Here are some support options:";
+        const firstMessage = createTextMessage({
+          waId: this.WaId,
+          textContent: firstText,
+          messagingServiceSid: this.messagingServiceSid,
+        });
+        await this.saveAndSendTextMessage(
+          firstMessage,
+          GoldingSignpostingFlow.FLOW_NAME
+        );
+        const texts = options.map((option) => option.name);
+        // send to LLM here
+        for (const text of texts) {
+          const message = createTextMessage({
+            waId: this.WaId,
+            textContent: text,
+            messagingServiceSid: this.messagingServiceSid,
+          });
+          await this.saveAndSendTextMessage(
+            message,
+            GoldingSignpostingFlow.FLOW_NAME
+          );
+        }
+      }
     } else {
       const config = goldingSignpostingConfig[flowSection]?.[flowStep];
       if (!config) {

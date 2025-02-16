@@ -120,14 +120,19 @@ class SignpostingService {
     return null;
   }
   async selectOptions({ category1Value, category2Value, location, page }) {
+    const PAGE_SIZE = 5;
     const selectedTag = this.getTag(category1Value, category2Value);
     if (selectedTag) {
-      const cursor = await this.collection.find({
-        "category_tags": selectedTag,
-      });
+      const cursor = await this.collection
+        .find({
+          "category_tags": selectedTag,
+        })
+        .skip((page - 1) * PAGE_SIZE)
+        .limit(PAGE_SIZE);
       const options = await cursor.toArray();
-      console.log("DB found some options", options);
+      return options;
     }
+    return [];
   }
 }
 
