@@ -122,17 +122,37 @@ class SignpostingService {
   async selectOptions({ category1Value, category2Value, location, page }) {
     const PAGE_SIZE = 5;
     const selectedTag = this.getTag(category1Value, category2Value);
-    if (selectedTag) {
-      const cursor = await this.collection
-        .find({
-          "category_tags": selectedTag,
-        })
-        .skip((page - 1) * PAGE_SIZE)
-        .limit(PAGE_SIZE);
-      const options = await cursor.toArray();
-      return options;
+    if (!selectedTag) {
+      return {
+        options: [],
+        totalCount: 0,
+        remainingCount: 0,
+      };
     }
-    return [];
+    const locationFilter = {
+      "local": { "area_covered": { "$ne": "National" } },
+      "national": { "area_covered": "National" },
+      "local_and_national": {},
+    };
+    const totalCount = await this.collection.countDocuments({
+      "category_tags": selectedTag,
+      ...locationFilter[location],
+    });
+
+    const cursor = await this.collection
+      .find({
+        "category_tags": selectedTag,
+        ...locationFilter[location],
+      })
+      .skip(Math.max((page - 1) * PAGE_SIZE, 0))
+      .limit(PAGE_SIZE);
+    const remainingCount = Math.max(totalCount - page * PAGE_SIZE, 0);
+    const options = await cursor.toArray();
+    return {
+      options,
+      totalCount,
+      remainingCount,
+    };
   }
 }
 

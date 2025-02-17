@@ -430,6 +430,7 @@ class InboundMessageHandler extends BaseMessageHandler {
         flowSection,
         flowStep,
         selectionValue: this.body.Body,
+        buttonPayload: this.buttonPayload,
       }
     );
     return updatedDoc.userSelection;

@@ -39,6 +39,7 @@ class FlowManagerService {
     "That's great, thanks",
   ];
 
+  static SIGNPOSTING_SEE_MORE_OPTIONS_MESSAGE = "see_more";
   static REPEAT_ENHAM_QA_MESSAGE = "yes-enham_qa";
   /**
    * @static
@@ -212,14 +213,16 @@ class FlowManagerService {
   async getCurrentFlow(userData, messageBody, buttonPayload) {
     //MOVE FLOW STEP INCREMENTING HERE
     try {
+      console.log("button Payload in get current flow", buttonPayload);
       const userId = userData.WaId;
       const currentFlowSnapshot = await this.db
         .collection("flows")
         .where("userId", "==", userId)
         .get();
       if (!currentFlowSnapshot.empty) {
-        const shouldUpdate =
-          !FlowManagerService.SEE_MORE_OPTIONS_MESSAGES.includes(messageBody);
+        const noFlowStepUpdate =
+          FlowManagerService.SIGNPOSTING_SEE_MORE_OPTIONS_MESSAGE ===
+          buttonPayload;
         const firstDoc = currentFlowSnapshot.docs[0];
         const data = firstDoc.data();
         const updateId = firstDoc.id;
@@ -231,7 +234,7 @@ class FlowManagerService {
         const hasBeenRestarted =
           FlowManagerService.ENHAM_START_OVER_MESSAGE == buttonPayload;
         data.id = updateId;
-        if (shouldUpdate) {
+        if (!noFlowStepUpdate) {
           await this.db.collection("flows").doc(updateId).update({
             "flowStep": updatedFlowStep,
             "restarted": hasBeenRestarted,
@@ -339,28 +342,46 @@ class FlowManagerService {
     flowSection,
     flowStep,
     selectionValue,
+    buttonPayload,
   }) {
     const flowRef = this.db.collection("flows").doc(flowId);
-    console.log("the current flow step in update is", flowStep);
+    console.log(
+      "the current data in update is",
+      flowStep,
+      selectionValue,
+      buttonPayload
+    );
+
+    // Guard clause: If "See More Options" is selected, increment page and return updated doc
+    if (
+      buttonPayload === FlowManagerService.SIGNPOSTING_SEE_MORE_OPTIONS_MESSAGE
+    ) {
+      await flowRef.update({
+        "userSelection.page": FieldValue.increment(1),
+      });
+      return (await flowRef.get()).data();
+    }
+
+    // Update based on flow section and step
     if (flowSection === 1) {
+      const updateData = {};
       if (flowStep === 2) {
-        await flowRef.update({
-          "userSelection.category_1": selectionValue,
-          "userSelection.page": 1,
-        });
+        updateData["userSelection.category_1"] = selectionValue;
+        updateData["userSelection.page"] = 1;
       } else if (flowStep === 3) {
-        await flowRef.update({
-          "userSelection.category_2": selectionValue,
-        });
+        updateData["userSelection.category_2"] = selectionValue;
       } else if (flowStep === 4) {
-        await flowRef.update({
-          "userSelection.location": selectionValue,
-        });
+        updateData["userSelection.location"] = selectionValue;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        await flowRef.update(updateData);
       }
     }
-    const updatedDoc = await flowRef.get();
-    return updatedDoc.data();
+
+    return (await flowRef.get()).data();
   }
+
   /**
    * Marks a survey as canceled if the specified selection matches a "cancel" value.
    * @param {Object} params - Parameters for survey cancellation.

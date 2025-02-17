@@ -3,9 +3,14 @@ const {
   goldingSignpostingConfig,
 } = require("../config/flowResponses/golding.config");
 const { signpostingTags } = require("../config/shared.config");
-const { createTextMessage } = require("../helpers/messages.helpers");
+const {
+  createTextMessage,
+  delayMessage,
+} = require("../helpers/messages.helpers");
 class GoldingSignpostingFlow extends BaseFlow {
   static FLOW_NAME = "signposting-golding";
+  static LAST_STEP = 5;
+  static LAST_SECTION = 1;
   constructor({
     userInfo,
     userMessage,
@@ -29,6 +34,22 @@ class GoldingSignpostingFlow extends BaseFlow {
   }) {
     console.log("ok we r here", flowStep, flowSection, this.messageContent);
     let flowCompletionStatus = false;
+    if (
+      flowSection === GoldingSignpostingFlow.LAST_SECTION &&
+      flowStep === GoldingSignpostingFlow.LAST_STEP
+    ) {
+      const lastText =
+        "Thanks for using the service just now. Please message 'hi' to search again.";
+      const message = createTextMessage({
+        waId: this.waId,
+        textContent: lastText,
+        messagingServiceSid: this.messagingServiceSid,
+      });
+      await this.saveAndSendTextMessage(
+        message,
+        GoldingSignpostingFlow.FLOW_NAME
+      );
+    }
     if (flowSection === 1 && flowStep === 2) {
       const messageItem = signpostingTags.find(
         (item) => item.buttonId === this.messageContent
@@ -48,12 +69,27 @@ ${messageItem.messageText}
       );
     } else if (flowSection === 1 && flowStep === 4) {
       const { page, category_1, category_2, location } = userSelection;
-      const options = await signpostingService.selectOptions({
-        category1Value: category_1,
-        category2Value: category_2,
-        location,
-        page,
-      });
+      const { options, totalCount, remainingCount } =
+        await signpostingService.selectOptions({
+          category1Value: category_1,
+          category2Value: category_2,
+          location,
+          page,
+        });
+      console.log(totalCount, remainingCount);
+      if (options.length === 0) {
+        const firstText =
+          "There seems to be nothing in our database for your search. Please message 'hi' to search again";
+        const firstMessage = createTextMessage({
+          waId: this.WaId,
+          textContent: firstText,
+          messagingServiceSid: this.messagingServiceSid,
+        });
+        await this.saveAndSendTextMessage(
+          firstMessage,
+          GoldingSignpostingFlow.FLOW_NAME
+        );
+      }
       if (options.length > 0) {
         const firstText = "Here are some support options:";
         const firstMessage = createTextMessage({
@@ -65,12 +101,34 @@ ${messageItem.messageText}
           firstMessage,
           GoldingSignpostingFlow.FLOW_NAME
         );
+        // send to llm here
         const texts = options.map((option) => option.name);
-        // send to LLM here
+        await delayMessage(3000);
         for (const text of texts) {
           const message = createTextMessage({
             waId: this.WaId,
             textContent: text,
+            messagingServiceSid: this.messagingServiceSid,
+          });
+          await delayMessage(3000);
+          await this.saveAndSendTextMessage(
+            message,
+            GoldingSignpostingFlow.FLOW_NAME
+          );
+        }
+        if (remainingCount > 0) {
+          await this.saveAndSendTemplateMessage({
+            templateKey: "signposting_see_more_options",
+            templateVariables: {
+              templateVariables: "Would you like to see more options?",
+            },
+          });
+        } else {
+          const lastText =
+            "Thanks for using the service just now. Please message 'hi' to search again.";
+          const message = createTextMessage({
+            waId: this.WaId,
+            textContent: lastText,
             messagingServiceSid: this.messagingServiceSid,
           });
           await this.saveAndSendTextMessage(
