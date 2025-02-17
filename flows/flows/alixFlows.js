@@ -1,13 +1,16 @@
+const { BaseFlow } = require("./BaseFlow");
+const {
+  alixSignpostingConfig,
+} = require("../config/flowResponses/alix.config");
+const { signpostingTags } = require("../config/shared.config");
 const {
   createTextMessage,
-  createTemplateMessage,
+  delayMessage,
 } = require("../helpers/messages.helpers");
-const { formatTag } = require("../helpers/format.helpers");
-const { sendMessage } = require("../helpers/twilio.helpers");
-const { findTemplateSid } = require("../helpers/twilio_account.helpers");
-const { BaseFlow } = require("./BaseFlow");
-class SignpostingV2Flow extends BaseFlow {
-  static FLOW_NAME = "signposting";
+class AlixSignpostingFlow extends BaseFlow {
+  static FLOW_NAME = "signposting-alix";
+  static LAST_STEP = 5;
+  static LAST_SECTION = 1;
   constructor({
     userInfo,
     userMessage,
@@ -23,160 +26,66 @@ class SignpostingV2Flow extends BaseFlow {
       organizationMessagingServiceSid,
     });
   }
-  async handleFlowStep(flowStep, flowSection) {
-    console.log("ok we r here", flowStep, flowSection, this.userMessage);
-    const flowCompletionStatus = true;
-    return flowCompletionStatus;
-  }
-}
-class SignpostingFlow extends BaseFlow {
-  static FLOW_NAME = "signposting";
-  constructor({
-    userInfo,
-    userMessage,
-    contactModel,
-    organizationPhoneNumber,
-    organizationMessagingServiceSid,
-  }) {
-    super({
-      userInfo,
-      userMessage,
-      contactModel,
-      organizationPhoneNumber,
-      organizationMessagingServiceSid,
-    });
-    this.signpostingTemplates = {};
-  }
-  async init() {
-    try {
-      const template1 = await findTemplateSid("signposting_options_1", false);
-
-      this.signpostingTemplates[1] = {
-        templateSid: template1?.templateSid,
-        templateName: template1?.templateName,
-        templateVariables: {
-          greeting:
-            "Welcome, please select a category below to see support options",
-        },
-      };
-
-      const template2 = await findTemplateSid(this.messageContent);
-      this.signpostingTemplates[2] = {
-        templateSid: template2?.templateSid,
-        templateName: template2?.templateName,
-        templateVariables: {
-          select_further_options:
-            "Thank you, please select a further option from the below",
-        },
-      };
-
-      const template3 = await findTemplateSid("location_choice", false);
-      this.signpostingTemplates[3] = {
-        templateSid: template3?.templateSid,
-        templateName: template3?.templateName,
-        templateVariables: {
-          location_choice_message:
-            "Thank you, would you like to see local options, national options or both?",
-        },
-      };
-    } catch (err) {
-      console.error("Error initializing templates:", err);
-    }
-  }
-
-  async checkUserSelectionError(location, category, supportOptionService) {
-    const isValidLocation = [
-      "local only",
-      "national only",
-      "local and national",
-    ].includes(location.toLowerCase());
-    const validCategories = await supportOptionService.getTags();
-    const isValidCategory = validCategories.includes(category);
-    if (!isValidCategory || !isValidLocation) {
-      return true;
-    } else return false;
-  }
-
-  async handleFlowStep(
+  async handleFlowStep({
     flowStep,
+    flowSection,
     userSelection,
-    supportOptionService,
-    llmService
-  ) {
-    console.log("user selection:", userSelection);
+    signpostingService,
+    llmService,
+  }) {
+    console.log("ok we r here", flowStep, flowSection, this.messageContent);
     let flowCompletionStatus = false;
-    if (flowStep <= 3) {
-      await this.init();
-      const templateSid = this.signpostingTemplates[flowStep]["templateSid"];
-      const templateVariables =
-        this.signpostingTemplates[flowStep]["templateVariables"];
-      const templateName = this.signpostingTemplates[flowStep]["templateName"];
-      const templateMessage = createTemplateMessage({
+    if (
+      flowSection === AlixSignpostingFlow.LAST_SECTION &&
+      flowStep === AlixSignpostingFlow.LAST_STEP
+    ) {
+      const lastText =
+        "Thanks for using the service just now. Please message 'hi' to search again.";
+      const message = createTextMessage({
         waId: this.WaId,
-        contentSid: templateSid,
-        templateVariables,
+        textContent: lastText,
         messagingServiceSid: this.messagingServiceSid,
       });
-      const insertedId = await this.saveResponseMessage({
-        message: templateMessage,
-        flowName: SignpostingFlow.FLOW_NAME,
-        templateName,
-      });
-      const sid = await sendMessage(templateMessage);
-      await this.updateResponse(insertedId, sid);
+      await this.saveAndSendTextMessage(message, AlixSignpostingFlow.FLOW_NAME);
     }
-    if (flowStep >= 4) {
-      const { location, category, page, endFlow } = userSelection;
-      if (endFlow) {
-        const message = this.createEndFlowMessage(this.WaId);
-        await this.saveAndSendTextMessage(message, SignpostingFlow.FLOW_NAME);
-        flowCompletionStatus = true;
-      } else {
-        const error = await this.checkUserSelectionError(
+    if (flowSection === 1 && flowStep === 2) {
+      const messageItem = signpostingTags.find(
+        (item) => item.buttonId === this.messageContent
+      );
+      const responseContent = `
+Thank you. Please select a further option from: 
+${messageItem.messageText}
+`;
+      const message = createTextMessage({
+        waId: this.WaId,
+        textContent: responseContent,
+        messagingServiceSid: this.messagingServiceSid,
+      });
+      await this.saveAndSendTextMessage(message, AlixSignpostingFlow.FLOW_NAME);
+    } else if (flowSection === 1 && flowStep === 4) {
+      const { page, category_1, category_2, location } = userSelection;
+      const { options, totalCount, remainingCount } =
+        await signpostingService.selectOptions({
+          category1Value: category_1,
+          category2Value: category_2,
           location,
-          category,
-          supportOptionService
-        );
-        if (error) {
-          flowCompletionStatus = true;
-          const errorMessage = await this.createErrorMessage(this.WaId);
-          await this.saveAndSendTextMessage(
-            errorMessage,
-            SignpostingFlow.FLOW_NAME
-          );
-          return flowCompletionStatus;
-        }
-        const { postcode, language, region } = this.userInfo;
-        const tag = formatTag(category);
-        const pageSize = 5;
-        const location_choice = location.toLowerCase();
-        const dbResult = await supportOptionService.selectOptions({
-          tag,
-          location: location_choice,
-          region,
           page,
-          pageSize,
         });
-        const { result, remaining } = dbResult;
-        if (result.length < 1) {
-          flowCompletionStatus = true;
-          const message = this.createNoOptionsMessage(this.WaId);
-          await this.saveAndSendTextMessage(message, SignpostingFlow.FLOW_NAME);
-          return flowCompletionStatus;
-        }
-        const moreOptionsAvailable = remaining >= 1;
-        if (!moreOptionsAvailable) {
-          flowCompletionStatus = true;
-        }
-        const aiApiRequest = {
-          options: result,
-          postcode: postcode,
-          language: language,
-          category: category,
-        };
-        console.log("sent to llm", JSON.stringify(aiApiRequest));
-        const response = await llmService.makeLLMRequest(aiApiRequest); //TO-DO refactor to use some sort of task parameter
-        const llmResponse = response.data.data;
+      console.log(totalCount, remainingCount);
+      if (options.length === 0) {
+        const firstText =
+          "There seems to be nothing in our database for your search. Please message 'hi' to search again";
+        const firstMessage = createTextMessage({
+          waId: this.WaId,
+          textContent: firstText,
+          messagingServiceSid: this.messagingServiceSid,
+        });
+        await this.saveAndSendTextMessage(
+          firstMessage,
+          AlixSignpostingFlow.FLOW_NAME
+        );
+      }
+      if (options.length > 0) {
         const firstText = "Here are some support options:";
         const firstMessage = createTextMessage({
           waId: this.WaId,
@@ -185,86 +94,90 @@ class SignpostingFlow extends BaseFlow {
         });
         await this.saveAndSendTextMessage(
           firstMessage,
-          SignpostingFlow.FLOW_NAME
+          AlixSignpostingFlow.FLOW_NAME
         );
-        for (const [index, item] of llmResponse.entries()) {
-          console.log("sending message:", item);
+        // send to llm here
+        let texts = options.map(
+          (option) =>
+            `${option.name}\n${option.description_short}\nLocation:${
+              option.location_scope === "local"
+                ? option.postcode
+                : option.area_covered
+            }\nWebsite:${option.external_url}"`
+        ); // in case theres an error in LLM response
+        const aiAPIRequest = {
+          options,
+          category: category_2,
+          language: "en", //default for now TO-DO add translation
+        };
+        const response = await llmService.makeLLMRequest(
+          aiAPIRequest,
+          AlixSignpostingFlow.FLOW_NAME
+        );
+        const LLMProcessedMessages = response.data?.data;
+        if (LLMProcessedMessages && LLMProcessedMessages.length > 0) {
+          texts = LLMProcessedMessages;
+        }
+        for (const text of texts) {
           const message = createTextMessage({
             waId: this.WaId,
-            textContent: item,
+            textContent: text,
             messagingServiceSid: this.messagingServiceSid,
           });
-          await this.saveAndSendTextMessage(message, SignpostingFlow.FLOW_NAME);
-          if (index === result.length - 1) {
-            const { lastMessage, templateName = null } =
-              await this.createLastOptionMessage(
-                this.WaId,
-                moreOptionsAvailable
-              );
-            const insertedId = await this.saveResponseMessage({
-              message: lastMessage,
-              flowName: SignpostingFlow.FLOW_NAME,
-              templateName,
-            });
-            const sid = await sendMessage(lastMessage);
-            await this.updateResponse(insertedId, sid);
-          }
+          await delayMessage(3000);
+          await this.saveAndSendTextMessage(
+            message,
+            AlixSignpostingFlow.FLOW_NAME
+          );
         }
+        if (remainingCount > 0) {
+          await this.saveAndSendTemplateMessage({
+            templateKey: "signposting_see_more_options",
+            templateVariables: {
+              templateVariables: "Would you like to see more options?",
+            },
+          });
+        } else {
+          const lastText =
+            "Thanks for using the service just now. Please message 'hi' to search again.";
+          const message = createTextMessage({
+            waId: this.WaId,
+            textContent: lastText,
+            messagingServiceSid: this.messagingServiceSid,
+          });
+          await this.saveAndSendTextMessage(
+            message,
+            AlixSignpostingFlow.FLOW_NAME
+          );
+        }
+      }
+    } else {
+      const config = alixSignpostingConfig[flowSection]?.[flowStep];
+      if (!config) {
+        return flowCompletionStatus;
+      }
+      const { responseContent, responseType, templateKey } = config;
+      if (responseType === "text") {
+        const message = createTextMessage({
+          waId: this.WaId,
+          textContent: responseContent,
+          messagingServiceSid: this.messagingServiceSid,
+        });
+        await this.saveAndSendTextMessage(
+          message,
+          AlixSignpostingFlow.FLOW_NAME
+        );
+      } else if (responseType === "template") {
+        await this.saveAndSendTemplateMessage({
+          templateKey,
+          templateVariables: responseContent,
+        });
       }
     }
     return flowCompletionStatus;
   }
-  async createLastOptionMessage(recipient, moreOptionsAvailable) {
-    let lastMessage, searchableTemplateName;
-    if (moreOptionsAvailable) {
-      const { templateSid, templateName } = await findTemplateSid(
-        "see_more_options",
-        false
-      );
-      const templateVariables = {
-        see_more_options_message: "Would you like to see more options?",
-      };
-      lastMessage = createTemplateMessage({
-        waId: recipient,
-        contentSid: templateSid,
-        templateVariables,
-        messagingServiceSid: this.messagingServiceSid,
-      });
-      searchableTemplateName = templateName;
-    } else {
-      const text =
-        "Thanks for using the service just now, please text 'hi' to search again";
-      lastMessage = createTextMessage({
-        waId: recipient,
-        textContent: text,
-        messagingServiceSid: this.messagingServiceSid,
-      });
-    }
-    return { templateName: searchableTemplateName, lastMessage };
-  }
-  createEndFlowMessage(recipient) {
-    const text =
-      "Thanks for using the service just now, please text 'hi' to search again";
-    const message = createTextMessage({
-      waId: recipient,
-      textContent: text,
-      messagingServiceSid: this.messagingServiceSid,
-    });
-    return message;
-  }
-  createNoOptionsMessage(recipient) {
-    const text =
-      "There seems to be nothing in our database for your search right now, please text 'hi' to start a new search";
-    const message = createTextMessage({
-      waId: recipient,
-      textContent: text,
-      messagingServiceSid: this.messagingServiceSid,
-    });
-    return message;
-  }
 }
 
 module.exports = {
-  SignpostingFlow,
-  SignpostingV2Flow,
+  AlixSignpostingFlow,
 };

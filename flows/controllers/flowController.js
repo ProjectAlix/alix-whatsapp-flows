@@ -1,6 +1,6 @@
 const {
   runEnhamComboFlow,
-  runSignpostingFlow,
+  runAlixSignpostingFlow,
   runGoldingSignpostingFlow,
   runSurveyFlow,
   runFMSocialSurveyFlow,
@@ -20,8 +20,7 @@ const { ContactModel } = require("../models/ContactModel");
  * @param {function} next - Express middleware next function.
  */
 async function flowController(req, res, next) {
-  const db = req.app.locals.signpostingOptionsDb; //Database for signposting
-  const controlRoomDb = req.app.locals.controlRoomDb; //Main message storage database
+  const controlRoomDB = req.app.locals.controlRoomDB; //Main message storage database
   //initialize flow completion status to send back to webhook API
   let flowCompletionStatus;
   try {
@@ -45,7 +44,7 @@ async function flowController(req, res, next) {
      * @see {@link ContactModel}
      */
     const contactModel = new ContactModel(
-      controlRoomDb,
+      controlRoomDB,
       startTime,
       organizationPhoneNumber
     );
@@ -64,12 +63,13 @@ async function flowController(req, res, next) {
     };
     //determine function to run based on request params, each function uses the `flowConstructorParams` to initialize the relevant Flow service/handler class
     //To-DO add guard clause to check is flow enabled for organization
-    if (flow === "signposting") {
+    if (flow === "signposting-alix") {
       const userSelection = req.body.userSelection;
-      flowCompletionStatus = await runSignpostingFlow({
-        db,
+      flowCompletionStatus = await runAlixSignpostingFlow({
+        db: controlRoomDB,
         flowConstructorParams,
         flowStep,
+        flowSection,
         userSelection,
       });
     } else if (flow === "survey") {
@@ -118,7 +118,7 @@ async function flowController(req, res, next) {
     } else if (flow === "signposting-golding") {
       const userSelection = req.body.userSelection;
       flowCompletionStatus = await runGoldingSignpostingFlow({
-        db: controlRoomDb,
+        db: controlRoomDB,
         flowConstructorParams,
         flowStep,
         flowSection,

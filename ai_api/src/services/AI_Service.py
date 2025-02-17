@@ -144,34 +144,6 @@ class VertexAI_Service(AI_Service):
         else:
             return response.text
         
-    def process_messages(self, options: List[Dict[str, Any]], category: str) -> List[str]:
-        """
-        Process multiple options and generate a concise description for each.
-
-        Args:
-            options (list[dict]): A list of dictionaries representing organization information.
-            category (str): The category of the organization.
-
-        Returns:
-            list[str]: A list of detailed messages for each organization.
-        """
-        model_responses=[]
-        for option in options:
-            print(option)
-            input=json.dumps(option)
-            prompt=f""" 
-                This is a dictionary representing information on a support organization within the UK. 
-                 The organization has been categorized. The category is {category}.
-                write a concise and helpful description of the organization. Don't mention the website.
-                Mention the name first. Include any additional details if you have knowledge of them. Keep your answer in the range of 2 sentences.
-                Organization dictionary:
-                {input}
-                """
-            response=self.get_model_response(prompt, {"temperature":0.5})
-            detail=f"""Website: {option["website"]}\nLocation: {option["location"]}"""
-            final_response=f"""{response}\n{detail}"""
-            model_responses.append(final_response)
-        return model_responses
     
     def describe_signposting_options(self, options: List[Dict[str, Any]], category:str)->List[str]:
         model_responses=[]

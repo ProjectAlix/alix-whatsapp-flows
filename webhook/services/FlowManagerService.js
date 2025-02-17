@@ -5,19 +5,7 @@ const { FieldValue } = require("firebase-admin/firestore");
  */
 class FlowManagerService {
   static SURVEY_CANCELLATION_MESSAGE = "cancel-survey";
-  /**
-   * @static
-   * @type {string}
-   * @description A predefined message identifier that signifies the user intends to move to the next section
-   * of the flow. This is used to check if the flow should advance to the next part.
-   */
   static FM_SURVEY_NEXT_SECTION_MESSAGE = "next_section";
-  /**
-   * @static
-   * @type {Object}
-   * @description Predefined message identifiers for setting up a search in signposting flow.
-   *
-   */
   static SOCIAL_SURVEY_PATH_CONFIG = {
     "graduation-event": 3,
     "end-of-year-social&&graduation-event": 3,
@@ -29,23 +17,8 @@ class FlowManagerService {
     4: "location",
   };
 
-  /**
-   * @static
-   * @type {Array<string>}
-   * @description Predefined messages to determine whether to paginate the results returned to the user during the signposting flow (getting next page)
-   */
-  static SEE_MORE_OPTIONS_MESSAGES = [
-    "See More Options",
-    "That's great, thanks",
-  ];
-
   static SIGNPOSTING_SEE_MORE_OPTIONS_MESSAGE = "see_more";
   static REPEAT_ENHAM_QA_MESSAGE = "yes-enham_qa";
-  /**
-   * @static
-   * @type {Object}
-   * @description Predefined configuration for conducting a user detail update.
-   */
   static ENHAM_SERVICE_OPTIONS = [
     "ask_questions",
     "training_and_quizzes",
@@ -285,55 +258,6 @@ class FlowManagerService {
       };
     } else {
       return { message: "No documents found for the specified userId" };
-    }
-  }
-
-  /**
-   * Updates user selection within a flow and optionally advances the flow step.
-   * @param {Object} params - Parameters for selection update.
-   * @param {string} params.flowId - The flow ID.
-   * @param {number} params.flowStep - Current step in the flow.
-   * @param {string} params.selectionValue - User selection value.
-   * @param {Array<string>} params.seeMoreOptionMessages - Options for selection behavior.
-   * @returns {Promise<Object|null>} Updated document data or null if not found.
-   * @see {@link ../handlers/MessageHandlers.js~InboundMessageHandler#updateUserSignpostingSelection}
-   */
-  async updateUserSelection({ flowId, flowStep, selectionValue }) {
-    console.log("SELECTION VALUE!", selectionValue);
-    const selectionNames = {
-      3: "category",
-      4: "location",
-    };
-    const flowRef = this.db.collection("flows").doc(flowId);
-    const runNextStep =
-      !FlowManagerService.SEE_MORE_OPTIONS_MESSAGES.includes(selectionValue);
-    if (selectionValue === FlowManagerService.SEE_MORE_OPTIONS_MESSAGES[0]) {
-      await flowRef.update({
-        "userSelection.page": FieldValue.increment(1),
-      });
-    } else if (
-      selectionValue === FlowManagerService.SEE_MORE_OPTIONS_MESSAGES[1]
-    ) {
-      await flowRef.update({
-        "userSelection.endFlow": true,
-      });
-    }
-    if (selectionNames[flowStep] && runNextStep) {
-      await flowRef.update({
-        [`userSelection.${selectionNames[flowStep]}`]: selectionValue,
-      });
-
-      console.log(
-        `Document property update with values: ${selectionNames[flowStep]} : ${selectionValue}`
-      );
-    }
-    const updatedDoc = await flowRef.get();
-
-    if (updatedDoc.exists) {
-      return updatedDoc.data(); // Return the data of the updated document
-    } else {
-      console.log("No such document!");
-      return null; // Return null if the document does not exist
     }
   }
 

@@ -11,14 +11,11 @@ async function connectToDB(uri, dbName) {
   }
 }
 
-async function initializeDatabases(app, primaryDbConfig, secondaryDbConfig) {
+async function initializeDatabases(app, dbConfig) {
   try {
-    const { primaryDbName, primaryDbUri } = primaryDbConfig;
-    const { secondaryDbName, secondaryDbUri } = secondaryDbConfig;
-    const primaryDb = await connectToDB(primaryDbUri, primaryDbName);
-    const secondaryDb = await connectToDB(secondaryDbUri, secondaryDbName);
-    app.locals.signpostingOptionsDb = primaryDb;
-    app.locals.controlRoomDb = secondaryDb;
+    const { dbName, dbUri } = dbConfig;
+    const controlRoomDB = await connectToDB(dbUri, dbName);
+    app.locals.controlRoomDB = controlRoomDB;
     console.log("Databases initialized");
   } catch (err) {
     console.error("Error initializing databases:", err);

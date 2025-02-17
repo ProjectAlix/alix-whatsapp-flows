@@ -165,18 +165,11 @@ class InboundMessageHandler extends BaseMessageHandler {
    * @returns {Promise<void>} - Resolves when the flow has been started.
    */
 
-  async startSignpostingFlow(userInfo, messageToSave) {
-    const extraData = {
-      userSelection: {
-        page: 1,
-        endFlow: false,
-      },
-    }; //extraData helps set up logic for the signposting flow (paginated results)
+  async startAlixSignpostingFlow(userInfo, messageToSave) {
     await this.startFlow({
       userInfo,
       messageToSave,
-      flowName: "signposting",
-      extraData,
+      flowName: "signposting-alix",
     });
   }
 
@@ -269,12 +262,7 @@ class InboundMessageHandler extends BaseMessageHandler {
       await this.databaseService.updateFlowStartTime(flowId);
     }
     // Handle flow-specific data updates based on the flow type, these methods are specific to each flow type so for handling any advanced logic you will likely need to add your own
-    if (flowName === "signposting") {
-      messageData.userSelection = await this.updateUserSignpostingSelection(
-        flowId,
-        flowStep
-      );
-    } else if (flowName === "survey") {
+    if (flowName === "survey") {
       await this.databaseService.updateFlowWithResponse(
         flowId,
         this.body.Body,
@@ -393,6 +381,20 @@ class InboundMessageHandler extends BaseMessageHandler {
       });
       messageData.flowSection = flowSection;
       messageData.flowStep = flowStep;
+    } else if (flowName === "signposting-alix") {
+      // not DRY but easier to make separate changes if needed
+      const { flowSection, flowStep } =
+        await this.flowManagerService.createNextSectionUpdate({
+          WaId: this.body.WaId,
+          buttonPayload: this.buttonPayload,
+        });
+      messageData.userSelection = await this.updateSignpostingSelection({
+        flowId,
+        flowSection,
+        flowStep,
+      });
+      messageData.flowSection = flowSection;
+      messageData.flowStep = flowStep;
     }
     await this.processFlowResponse({
       flowName,
@@ -400,27 +402,6 @@ class InboundMessageHandler extends BaseMessageHandler {
       messageData,
       flowId,
     });
-  }
-  /**
-   * Updates user's selection for signposting flow.
-   * @param {string} flowId - The unique flow ID.
-   * @param {number} currentFlowStep - The current step in the flow.
-   * @returns {Promise<string>} - The updated user selection.
-   */
-
-  async updateUserSignpostingSelection(flowId, currentFlowStep) {
-    console.log({
-      flowId,
-      flowStep: currentFlowStep,
-      selectionValue: this.body.Body,
-      seeMoreOptionMessages: InboundMessageHandler.SEE_MORE_OPTIONS_MESSAGES,
-    });
-    const updatedDoc = await this.flowManagerService.updateUserSelection({
-      flowId,
-      flowStep: currentFlowStep,
-      selectionValue: this.body.Body,
-    });
-    return updatedDoc?.userSelection;
   }
 
   async updateSignpostingSelection({ flowId, flowSection, flowStep }) {
@@ -433,6 +414,7 @@ class InboundMessageHandler extends BaseMessageHandler {
         buttonPayload: this.buttonPayload,
       }
     );
+    console.log("HERE WTF");
     return updatedDoc.userSelection;
   }
   /**

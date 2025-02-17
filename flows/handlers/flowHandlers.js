@@ -4,7 +4,7 @@ const {
   EnhamPARegisterFlow,
   EnhamDetailCheckFlow,
 } = require("../flows/enhamFlows");
-const { SignpostingFlow } = require("../flows/alixFlows");
+const { AlixSignpostingFlow } = require("../flows/alixFlows");
 const { GoldingSignpostingFlow } = require("../flows/goldingFlows");
 const { FMSocialSurveyFlow, FatMacysSurveyFlow } = require("../flows/fmFlows");
 const { SupportOptionService } = require("../services/dn/SupportOptionService");
@@ -202,10 +202,11 @@ async function runSurveyFlow({
  * @param {string} params.userSelection - User-selected option within the flow.
  * @returns {Promise<boolean>} The completion status of the flow.
  */
-async function runSignpostingFlow({
+async function runAlixSignpostingFlow({
   db,
   flowConstructorParams,
   flowStep,
+  flowSection,
   userSelection,
 }) {
   const {
@@ -215,21 +216,22 @@ async function runSignpostingFlow({
     organizationPhoneNumber,
     organizationMessagingServiceSid,
   } = flowConstructorParams;
-  const signpostingFlow = new SignpostingFlow({
+  const signpostingFlow = new AlixSignpostingFlow({
     userInfo,
     userMessage,
     contactModel,
     organizationPhoneNumber,
     organizationMessagingServiceSid,
   });
-  const supportOptionService = new SupportOptionService(db);
+  const signpostingService = new SignpostingService(db);
   const llmService = new LLMService(api_base);
-  const flowCompletionStatus = await signpostingFlow.handleFlowStep(
+  const flowCompletionStatus = await signpostingFlow.handleFlowStep({
     flowStep,
+    flowSection,
     userSelection,
-    supportOptionService,
-    llmService
-  );
+    signpostingService,
+    llmService,
+  });
   return flowCompletionStatus;
 }
 
@@ -268,7 +270,7 @@ async function runGoldingSignpostingFlow({
 
 module.exports = {
   runEnhamComboFlow,
-  runSignpostingFlow,
+  runAlixSignpostingFlow,
   runGoldingSignpostingFlow,
   runSurveyFlow,
   runFMSocialSurveyFlow,
