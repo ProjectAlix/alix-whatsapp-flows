@@ -1,0 +1,7 @@
+.env
+logs/
+node_modules/
+app.yaml
+.gcloudignore
+utils/
+mongoScripts.js

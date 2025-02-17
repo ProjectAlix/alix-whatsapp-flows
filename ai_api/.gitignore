@@ -1,0 +1,6 @@
+.env
+__pycache__
+.ipynb_checkpoints/
+app.yaml
+.gcloudignore
+audio_downloads/
