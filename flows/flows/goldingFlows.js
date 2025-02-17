@@ -11,6 +11,9 @@ class GoldingSignpostingFlow extends BaseFlow {
   static FLOW_NAME = "signposting-golding";
   static LAST_STEP = 5;
   static LAST_SECTION = 1;
+  static ORGANIZATION_FILTER = {
+    "organizationName": "Golding",
+  };
   constructor({
     userInfo,
     userMessage,
@@ -76,6 +79,7 @@ ${messageItem.messageText}
           category2Value: category_2,
           location,
           page,
+          organizationFilter: GoldingSignpostingFlow.ORGANIZATION_FILTER,
         });
       console.log(totalCount, remainingCount);
       if (options.length === 0) {

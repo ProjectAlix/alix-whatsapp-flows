@@ -1,7 +1,7 @@
 const { ObjectId } = require("mongodb");
 const { logFlowStatus } = require("../helpers/logging.helpers");
 const { nextReminderUpdateConfig } = require("../config/flows.config");
-const { getNestedField } = require("../helpers/formatting.helpers");
+
 /**
  * Service class to handle database operations related to contacts, organizations, messages, and flows.
  */
@@ -54,7 +54,7 @@ class DatabaseService {
         "organizationPhoneNumber": organizationPhoneNumber,
       });
       const contactOrganizationId = contactOrganization._id;
-      const contact = await this.contactCollection.findOneAndUpdate(
+      await this.contactCollection.findOneAndUpdate(
         { "WaId": WaId, "organizationId": contactOrganizationId },
         { "$set": updateDoc }
       );

@@ -119,7 +119,13 @@ class SignpostingService {
     }
     return null;
   }
-  async selectOptions({ category1Value, category2Value, location, page }) {
+  async selectOptions({
+    category1Value,
+    category2Value,
+    location,
+    page,
+    organizationFilter,
+  }) {
     const PAGE_SIZE = 5;
     const selectedTag = this.getTag(category1Value, category2Value);
     if (!selectedTag) {
@@ -137,6 +143,7 @@ class SignpostingService {
     const totalCount = await this.collection.countDocuments({
       "category_tags": selectedTag,
       ...locationFilter[location],
+      ...organizationFilter,
     });
 
     const cursor = await this.collection
@@ -144,6 +151,7 @@ class SignpostingService {
         {
           "category_tags": selectedTag,
           ...locationFilter[location],
+          ...organizationFilter,
         },
         { "_id": 0 }
       )

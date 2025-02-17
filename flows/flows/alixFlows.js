@@ -11,6 +11,9 @@ class AlixSignpostingFlow extends BaseFlow {
   static FLOW_NAME = "signposting-alix";
   static LAST_STEP = 5;
   static LAST_SECTION = 1;
+  static ORGANIZATION_FILTER = {
+    "organizationName": "Alix",
+  };
   constructor({
     userInfo,
     userMessage,
@@ -70,6 +73,7 @@ ${messageItem.messageText}
           category2Value: category_2,
           location,
           page,
+          organizationFilter: AlixSignpostingFlow.ORGANIZATION_FILTER,
         });
       console.log(totalCount, remainingCount);
       if (options.length === 0) {

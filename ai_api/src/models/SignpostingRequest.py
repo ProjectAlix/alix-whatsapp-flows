@@ -11,6 +11,7 @@ class SignpostingOption(BaseModel):
     external_url: str
     email: str
     name: str
+    organizationName:str
 class SignpostingRequest(BaseModel):
     options:List[SignpostingOption]
     language:str
