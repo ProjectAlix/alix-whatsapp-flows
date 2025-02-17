@@ -172,6 +172,27 @@ class VertexAI_Service(AI_Service):
             final_response=f"""{response}\n{detail}"""
             model_responses.append(final_response)
         return model_responses
+    
+    def describe_signposting_options(self, options: List[Dict[str, Any]], category:str)->List[str]:
+        model_responses=[]
+        for option in options:
+            print(option)
+            input=json.dumps(option)
+            prompt=f"""
+                This is a dictionary representing information on a support organization within the UK. 
+                 The organization has been categorized. The category is {category}.
+                write a concise and helpful description of the organization. Don't mention the website.
+                Mention the name first. Include any additional details if you have knowledge of them. Keep your answer in the range of 2 sentences.
+                Organization dictionary:
+                {input}               
+"""
+            response=self.get_model_response(prompt, {"temperature":0.6})
+            location=option['postcode'] if option['location_scope']=='local' else option['area_covered'] #TO-DO check location logic
+            detail=f"""Website/Social URL: {option['external_url']}\nLocation: {location}"""
+            final_response=f"""{response}\n{detail}"""
+            model_responses.append(final_response)
+        return model_responses
+
             
 class OpenAI_Service(AI_Service):
     ASSISTANT_IDS={

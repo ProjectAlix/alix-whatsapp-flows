@@ -255,11 +255,13 @@ async function runGoldingSignpostingFlow({
     organizationPhoneNumber,
     organizationMessagingServiceSid,
   });
+  const llmService = new LLMService(api_base);
   const flowCompletionStatus = await goldingSignpostingFlow.handleFlowStep({
     flowStep,
     flowSection,
     userSelection,
     signpostingService,
+    llmService,
   });
   return flowCompletionStatus;
 }

@@ -31,6 +31,7 @@ class GoldingSignpostingFlow extends BaseFlow {
     flowSection,
     userSelection,
     signpostingService,
+    llmService,
   }) {
     console.log("ok we r here", flowStep, flowSection, this.messageContent);
     let flowCompletionStatus = false;
@@ -102,8 +103,27 @@ ${messageItem.messageText}
           GoldingSignpostingFlow.FLOW_NAME
         );
         // send to llm here
-        const texts = options.map((option) => option.name);
-        await delayMessage(3000);
+        let texts = options.map(
+          (option) =>
+            `${option.name}\n${option.description_short}\nLocation:${
+              option.location_scope === "local"
+                ? option.postcode
+                : option.area_covered
+            }\nWebsite:${option.external_url}"`
+        ); // in case theres an error in LLM response
+        const aiAPIRequest = {
+          options,
+          category: category_2,
+          language: "en", //default for now TO-DO add translation
+        };
+        const response = await llmService.makeLLMRequest(
+          aiAPIRequest,
+          GoldingSignpostingFlow.FLOW_NAME
+        );
+        const LLMProcessedMessages = response.data?.data;
+        if (LLMProcessedMessages && LLMProcessedMessages.length > 0) {
+          texts = LLMProcessedMessages;
+        }
         for (const text of texts) {
           const message = createTextMessage({
             waId: this.WaId,

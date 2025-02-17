@@ -140,10 +140,13 @@ class SignpostingService {
     });
 
     const cursor = await this.collection
-      .find({
-        "category_tags": selectedTag,
-        ...locationFilter[location],
-      })
+      .find(
+        {
+          "category_tags": selectedTag,
+          ...locationFilter[location],
+        },
+        { "_id": 0 }
+      )
       .skip(Math.max((page - 1) * PAGE_SIZE, 0))
       .limit(PAGE_SIZE);
     const remainingCount = Math.max(totalCount - page * PAGE_SIZE, 0);

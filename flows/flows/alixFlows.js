@@ -175,8 +175,8 @@ class SignpostingFlow extends BaseFlow {
           category: category,
         };
         console.log("sent to llm", JSON.stringify(aiApiRequest));
-        const response = await llmService.make_llm_request(aiApiRequest); //TO-DO refactor to use some sort of task parameter
-        const llmResponse = response.data;
+        const response = await llmService.makeLLMRequest(aiApiRequest); //TO-DO refactor to use some sort of task parameter
+        const llmResponse = response.data.data;
         const firstText = "Here are some support options:";
         const firstMessage = createTextMessage({
           waId: this.WaId,

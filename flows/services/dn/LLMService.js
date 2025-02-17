@@ -3,7 +3,7 @@ class LLMService {
   constructor(api_base) {
     this.api_base = api_base;
   }
-  async make_llm_request(requestBody, path, mockResponse = false) {
+  async makeLLMRequest(requestBody, path, mockResponse = false) {
     if (mockResponse) {
       return {
         data: "mock api response",
