@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from .routes import llm, tasks
+from .routes import llm, tasks, health
 
 
 app = FastAPI()
@@ -23,3 +23,4 @@ def main():
 
 app.include_router(llm.router)
 app.include_router(tasks.router)
+app.include_router(health.router)

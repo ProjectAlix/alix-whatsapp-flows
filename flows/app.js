@@ -5,6 +5,7 @@ const logger = require("morgan");
 const indexRouter = require("./routes/index");
 const flowRouter = require("./routes/flow");
 const adminRouter = require("./routes/admin");
+const healthRouter = require("./routes/health");
 const app = express();
 
 app.use(logger("dev"));
@@ -15,7 +16,7 @@ app.use(cookieParser());
 app.use("/", indexRouter);
 app.use("/flows", flowRouter);
 app.use("/admin", adminRouter);
-
+app.use("/health", healthRouter);
 // app.use(logger("dev"));
 // app.use(express.json());
 // app.use(express.urlencoded({ extended: false }));
